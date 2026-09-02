@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
-import { fetchMe, updateMe } from '../api/auth';
+import { QRCodeSVG } from 'qrcode.react';
+import { useNavigate } from 'react-router-dom';
+import { fetchCheckinToken, fetchMe, updateMe } from '../api/auth';
 import { fetchMyMembership } from '../api/membership';
+import { useAuth } from '../context/AuthContext';
 
 const MEMBERSHIP_STATUS_LABELS = {
   active: 'Activa',
@@ -9,9 +12,12 @@ const MEMBERSHIP_STATUS_LABELS = {
 };
 
 export default function ProfilePage() {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [membership, setMembership] = useState(null);
   const [membershipMessage, setMembershipMessage] = useState(null);
+  const [checkinToken, setCheckinToken] = useState(null);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({ first_name: '', last_name: '', phone: '' });
   const [saving, setSaving] = useState(false);
@@ -32,6 +38,12 @@ export default function ProfilePage() {
         setMembership(myMembership);
       } catch (err) {
         setMembershipMessage(err.message || 'No tienes ninguna membresía registrada todavía.');
+      }
+      try {
+        const { token } = await fetchCheckinToken();
+        setCheckinToken(token);
+      } catch {
+        // No es crítico para el resto de la página si esto falla.
       }
       setLoading(false);
     }
@@ -58,6 +70,11 @@ export default function ProfilePage() {
     }
   }
 
+  async function handleLogout() {
+    await logout();
+    navigate('/login');
+  }
+
   if (loading) return <div className="page-loading">Cargando…</div>;
 
   return (
@@ -67,6 +84,16 @@ export default function ProfilePage() {
       </div>
 
       <div className="profile-grid">
+        {checkinToken && (
+          <div className="card" style={{ textAlign: 'center' }}>
+            <h3 style={{ marginBottom: '0.75rem' }}>Tu código de check-in</h3>
+            <QRCodeSVG value={checkinToken} size={180} />
+            <p style={{ color: 'var(--color-muted)', fontSize: '0.85rem', marginTop: '0.75rem' }}>
+              Muéstralo en recepción al llegar a tu clase.
+            </p>
+          </div>
+        )}
+
         <div className="card membership-card">
           <div className="membership-type">{membership ? membership.membership_type_name : 'Sin membresía'}</div>
           {membership ? (
@@ -130,6 +157,10 @@ export default function ProfilePage() {
             </button>
           </form>
         </div>
+
+        <button type="button" className="btn btn-ghost" onClick={handleLogout}>
+          Cerrar sesión
+        </button>
       </div>
     </div>
   );

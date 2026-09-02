@@ -1,20 +1,14 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
+  const { user } = useAuth();
 
   if (!user) return null;
 
-  async function handleLogout() {
-    await logout();
-    navigate('/login');
-  }
-
   return (
     <nav className="navbar">
-      <span className="navbar-brand">Estudio</span>
+      <span className="navbar-brand">{user.gym_name || 'Estudio'}</span>
       <div className="navbar-links">
         <NavLink to="/schedule" className={({ isActive }) => `navbar-link${isActive ? ' active' : ''}`}>
           Horario
@@ -25,9 +19,6 @@ export default function Navbar() {
         <NavLink to="/profile" className={({ isActive }) => `navbar-link${isActive ? ' active' : ''}`}>
           Perfil
         </NavLink>
-        <button type="button" className="btn btn-ghost btn-small" onClick={handleLogout}>
-          Salir
-        </button>
       </div>
     </nav>
   );

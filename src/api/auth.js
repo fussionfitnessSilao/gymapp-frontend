@@ -25,6 +25,10 @@ export function fetchMe() {
   return request('/me/');
 }
 
+export function fetchCheckinToken() {
+  return request('/me/checkin-token/');
+}
+
 export function updateMe(payload) {
   return request('/me/', { method: 'PATCH', body: payload });
 }
