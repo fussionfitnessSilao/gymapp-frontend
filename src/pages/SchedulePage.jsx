@@ -85,7 +85,6 @@ export default function SchedulePage() {
   return (
     <div className="page">
       <div className="page-header">
-        <h1>Horario</h1>
         <p>Las próximas dos semanas de clases.</p>
       </div>
 

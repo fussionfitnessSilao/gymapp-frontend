@@ -73,10 +73,6 @@ export default function MyReservationsPage() {
 
   return (
     <div className="page">
-      <div className="page-header">
-        <h1>Mis reservas</h1>
-      </div>
-
       <div className="tabs">
         <button type="button" className={`tab${scope === 'upcoming' ? ' active' : ''}`} onClick={() => setScope('upcoming')}>
           Próximas
