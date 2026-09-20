@@ -55,6 +55,9 @@ export default function LoginPage() {
               onChange={(event) => setPassword(event.target.value)}
             />
           </div>
+          <p className="auth-switch" style={{ textAlign: 'right', marginTop: '-0.5rem' }}>
+            <Link to="/forgot-password">¿Olvidaste tu contraseña?</Link>
+          </p>
           <button type="submit" className="btn btn-primary btn-block" disabled={submitting}>
             {submitting ? 'Entrando…' : 'Entrar'}
           </button>

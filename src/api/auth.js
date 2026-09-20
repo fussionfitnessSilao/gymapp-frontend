@@ -32,3 +32,15 @@ export function fetchCheckinToken() {
 export function updateMe(payload) {
   return request('/me/', { method: 'PATCH', body: payload });
 }
+
+export function requestPasswordReset(email) {
+  return request('/auth/password-reset/', { method: 'POST', body: { email }, auth: false });
+}
+
+export function confirmPasswordReset({ uid, token, new_password: newPassword }) {
+  return request('/auth/password-reset/confirm/', {
+    method: 'POST',
+    body: { uid, token, new_password: newPassword },
+    auth: false,
+  });
+}
