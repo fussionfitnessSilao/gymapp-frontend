@@ -19,6 +19,9 @@ export default function Navbar() {
         <NavLink to="/profile" className={({ isActive }) => `navbar-link${isActive ? ' active' : ''}`}>
           Perfil
         </NavLink>
+        <NavLink to="/instalar" className={({ isActive }) => `navbar-link${isActive ? ' active' : ''}`}>
+          Instalar app
+        </NavLink>
       </div>
     </nav>
   );

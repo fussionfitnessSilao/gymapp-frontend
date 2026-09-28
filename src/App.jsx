@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import InstallGuidePage from './pages/InstallGuidePage';
 import LoginPage from './pages/LoginPage';
 import MyReservationsPage from './pages/MyReservationsPage';
 import ProfilePage from './pages/ProfilePage';
@@ -20,6 +21,7 @@ export default function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/instalar" element={<InstallGuidePage />} />
           <Route
             path="/schedule"
             element={
