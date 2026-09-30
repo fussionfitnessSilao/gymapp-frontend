@@ -85,7 +85,7 @@ export default function SchedulePage() {
   return (
     <div className="page">
       <div className="page-header">
-        <p>Las próximas dos semanas de clases.</p>
+        <p>Las próximas clases.</p>
       </div>
 
       {loadError && <div className="error-banner">{loadError}</div>}
