@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import CapacityDots from '../components/CapacityDots';
 import { createReservation } from '../api/reservations';
 import { fetchSessions } from '../api/sessions';
+import { joinWaitlist, leaveWaitlist } from '../api/waitlist';
 
 const ERROR_MESSAGES = {
   MEMBERSHIP_EXPIRED: 'No tienes una membresía vigente. Habla con recepción.',
@@ -38,6 +39,7 @@ export default function SchedulePage() {
   const [loadError, setLoadError] = useState(null);
   const [actionErrors, setActionErrors] = useState({});
   const [reservingId, setReservingId] = useState(null);
+  const [waitlistBusyId, setWaitlistBusyId] = useState(null);
 
   async function loadSessions() {
     setLoading(true);
@@ -78,6 +80,22 @@ export default function SchedulePage() {
     }
   }
 
+  async function handleWaitlist(sessionId, action) {
+    setWaitlistBusyId(sessionId);
+    setActionErrors((prev) => ({ ...prev, [sessionId]: null }));
+    try {
+      await (action === 'join' ? joinWaitlist(sessionId) : leaveWaitlist(sessionId));
+      await loadSessions();
+    } catch (err) {
+      setActionErrors((prev) => ({
+        ...prev,
+        [sessionId]: ERROR_MESSAGES[err.code] || err.message || 'No pudimos actualizar la lista de espera.',
+      }));
+    } finally {
+      setWaitlistBusyId(null);
+    }
+  }
+
   if (loading) return <div className="page-loading">Cargando horario…</div>;
 
   const grouped = groupByDay(sessions);
@@ -108,8 +126,16 @@ export default function SchedulePage() {
                 <div className="session-meta">
                   <span>{session.instructor_name}</span>
                   <CapacityDots capacity={session.capacity} spotsAvailable={session.spots_available} />
+                  {session.spots_available <= 0 && session.waitlist_count > 0 && (
+                    <span>{session.waitlist_count} en espera</span>
+                  )}
                   {session.is_special_event && <span className="badge badge-accent">Evento especial</span>}
                 </div>
+                {session.my_waitlist_position != null && (
+                  <div style={{ marginTop: '0.4rem', fontSize: '0.85rem', color: 'var(--color-muted)' }}>
+                    Si alguien cancela con tiempo, tu lugar se reserva solo y te avisamos por WhatsApp.
+                  </div>
+                )}
                 {actionErrors[session.id] && <div className="error-banner">{actionErrors[session.id]}</div>}
               </div>
               <div className="session-actions">
@@ -117,6 +143,9 @@ export default function SchedulePage() {
                   session={session}
                   reserving={reservingId === session.id}
                   onReserve={() => handleReserve(session.id)}
+                  waitlistBusy={waitlistBusyId === session.id}
+                  onJoinWaitlist={() => handleWaitlist(session.id, 'join')}
+                  onLeaveWaitlist={() => handleWaitlist(session.id, 'leave')}
                 />
               </div>
             </div>
@@ -133,7 +162,7 @@ const RESERVED_STATUS_LABELS = {
   no_show: 'No show',
 };
 
-function ReserveButton({ session, reserving, onReserve }) {
+function ReserveButton({ session, reserving, onReserve, waitlistBusy, onJoinWaitlist, onLeaveWaitlist }) {
   if (session.my_reservation_status && session.my_reservation_status !== 'cancelled') {
     return (
       <span className={`badge badge-status-${session.my_reservation_status}`}>
@@ -141,7 +170,24 @@ function ReserveButton({ session, reserving, onReserve }) {
       </span>
     );
   }
+  if (session.my_waitlist_position != null) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.35rem' }}>
+        <span className="badge badge-accent">En espera · lugar {session.my_waitlist_position}</span>
+        <button type="button" className="btn btn-ghost btn-small" onClick={onLeaveWaitlist} disabled={waitlistBusy}>
+          {waitlistBusy ? 'Saliendo…' : 'Salir de la lista'}
+        </button>
+      </div>
+    );
+  }
   if (session.spots_available <= 0) {
+    if (session.can_join_waitlist) {
+      return (
+        <button type="button" className="btn btn-primary btn-small" onClick={onJoinWaitlist} disabled={waitlistBusy}>
+          {waitlistBusy ? 'Anotando…' : 'Lista de espera'}
+        </button>
+      );
+    }
     return (
       <button type="button" className="btn btn-ghost btn-small" disabled>
         Sin cupo

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { cancelReservation, fetchReservations } from '../api/reservations';
+import { fetchMyWaitlist, leaveWaitlist } from '../api/waitlist';
 
 const STATUS_LABELS = {
   confirmed: 'Confirmada',
@@ -26,6 +27,8 @@ function hoursUntil(dateStr) {
 export default function MyReservationsPage() {
   const [scope, setScope] = useState('upcoming');
   const [reservations, setReservations] = useState([]);
+  const [waitlist, setWaitlist] = useState([]);
+  const [leavingId, setLeavingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [confirmingId, setConfirmingId] = useState(null);
@@ -36,8 +39,13 @@ export default function MyReservationsPage() {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchReservations({ scope: currentScope });
+      // La lista de espera solo aplica a lo próximo; si falla no debe tumbar las reservaciones.
+      const [data, waitlistData] = await Promise.all([
+        fetchReservations({ scope: currentScope }),
+        currentScope === 'upcoming' ? fetchMyWaitlist().catch(() => ({ results: [] })) : Promise.resolve({ results: [] }),
+      ]);
       setReservations(data.results || []);
+      setWaitlist(waitlistData.results || []);
     } catch (err) {
       setError(err.message || 'No pudimos cargar tus reservaciones.');
     } finally {
@@ -69,6 +77,20 @@ export default function MyReservationsPage() {
     }
   }
 
+  async function handleLeaveWaitlist(entry) {
+    setLeavingId(entry.id);
+    setError(null);
+    try {
+      await leaveWaitlist(entry.class_session);
+      setResultMessage('Saliste de la lista de espera.');
+      await load(scope);
+    } catch (err) {
+      setError(err.message || 'No pudimos sacarte de la lista de espera.');
+    } finally {
+      setLeavingId(null);
+    }
+  }
+
   if (loading) return <div className="page-loading">Cargando…</div>;
 
   return (
@@ -89,11 +111,42 @@ export default function MyReservationsPage() {
         </div>
       )}
 
-      {reservations.length === 0 && !error && (
+      {reservations.length === 0 && waitlist.length === 0 && !error && (
         <div className="empty-state">
           <h3>{scope === 'upcoming' ? 'No tienes reservas próximas' : 'Aún no tienes historial'}</h3>
           <p>{scope === 'upcoming' ? 'Ve al horario para reservar tu próxima clase.' : 'Tus clases pasadas van a aparecer aquí.'}</p>
         </div>
+      )}
+
+      {scope === 'upcoming' && waitlist.length > 0 && (
+        <>
+          <h3 style={{ margin: '0 0 0.5rem' }}>En lista de espera</h3>
+          {waitlist.map((entry) => (
+            <div className="card reservation-card" key={entry.id}>
+              <div className="reservation-card-top">
+                <div>
+                  <h3>{entry.class_session_name}</h3>
+                  <div className="reservation-date">{formatDateTime(entry.class_session_start)}</div>
+                </div>
+                <span className="badge badge-accent">Lugar {entry.position}</span>
+              </div>
+              <p style={{ margin: '0.5rem 0 0', fontSize: '0.85rem', color: 'var(--color-muted)' }}>
+                Si alguien cancela con tiempo, tu lugar se reserva solo y te avisamos por WhatsApp.
+              </p>
+              <div style={{ marginTop: '0.75rem' }}>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-small"
+                  onClick={() => handleLeaveWaitlist(entry)}
+                  disabled={leavingId === entry.id}
+                >
+                  {leavingId === entry.id ? 'Saliendo…' : 'Salir de la lista'}
+                </button>
+              </div>
+            </div>
+          ))}
+          {reservations.length > 0 && <h3 style={{ margin: '1.25rem 0 0.5rem' }}>Reservaciones</h3>}
+        </>
       )}
 
       {reservations.map((reservation) => {
