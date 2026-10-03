@@ -167,19 +167,29 @@ function ReserveButton({ session, reserving, onReserve, waitlistBusy, onJoinWait
       </span>
     );
   }
+  const waitlistStack = (button) => (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.35rem' }}>
+      <span className="badge badge-accent" style={{ textAlign: 'center' }}>
+        Lista de espera
+      </span>
+      {button}
+    </div>
+  );
+
   if (session.my_waitlist_position != null) {
-    return (
+    return waitlistStack(
       <button type="button" className="btn btn-ghost btn-small" onClick={onLeaveWaitlist} disabled={waitlistBusy}>
         {waitlistBusy ? 'Cancelando…' : 'Cancelar'}
-      </button>
+      </button>,
     );
   }
   if (session.spots_available <= 0) {
     if (session.can_join_waitlist) {
-      return (
+      // Igual que una reservación normal: botón "Reservar" y, encima, la etiqueta que aclara que es lista de espera.
+      return waitlistStack(
         <button type="button" className="btn btn-primary btn-small" onClick={onJoinWaitlist} disabled={waitlistBusy}>
-          {waitlistBusy ? 'Anotando…' : 'Lista de espera'}
-        </button>
+          {waitlistBusy ? 'Reservando…' : 'Reservar'}
+        </button>,
       );
     }
     return (
