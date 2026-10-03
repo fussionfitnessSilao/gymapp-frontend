@@ -131,7 +131,7 @@ export default function MyReservationsPage() {
                 <span className="badge badge-accent">Lugar {entry.position}</span>
               </div>
               <p style={{ margin: '0.5rem 0 0', fontSize: '0.85rem', color: 'var(--color-muted)' }}>
-                Si alguien cancela con tiempo, tu lugar se reserva solo y te avisamos por WhatsApp.
+                Si alguien cancela con tiempo, tu lugar se reserva solo y te avisamos.
               </p>
               <div style={{ marginTop: '0.75rem' }}>
                 <button

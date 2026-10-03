@@ -133,7 +133,7 @@ export default function SchedulePage() {
                 </div>
                 {session.my_waitlist_position != null && (
                   <div style={{ marginTop: '0.4rem', fontSize: '0.85rem', color: 'var(--color-muted)' }}>
-                    Si alguien cancela con tiempo, tu lugar se reserva solo y te avisamos por WhatsApp.
+                    Si alguien cancela con tiempo, tu lugar se reserva solo y te avisamos.
                   </div>
                 )}
                 {actionErrors[session.id] && <div className="error-banner">{actionErrors[session.id]}</div>}
