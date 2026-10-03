@@ -128,7 +128,7 @@ export default function MyReservationsPage() {
                   <h3>{entry.class_session_name}</h3>
                   <div className="reservation-date">{formatDateTime(entry.class_session_start)}</div>
                 </div>
-                <span className="badge badge-accent">Lugar {entry.position}</span>
+                <span className="badge badge-accent">En espera</span>
               </div>
               <p style={{ margin: '0.5rem 0 0', fontSize: '0.85rem', color: 'var(--color-muted)' }}>
                 Si alguien cancela con tiempo, tu lugar se reserva solo y te avisamos.
