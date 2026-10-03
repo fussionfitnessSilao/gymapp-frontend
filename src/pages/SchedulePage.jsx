@@ -126,24 +126,11 @@ export default function SchedulePage() {
                 <div className="session-meta">
                   <span>{session.instructor_name}</span>
                   <CapacityDots capacity={session.capacity} spotsAvailable={session.spots_available} />
-                  {session.spots_available <= 0 && session.waitlist_count > 0 && (
-                    <span>{session.waitlist_count} en espera</span>
-                  )}
                   {session.is_special_event && <span className="badge badge-accent">Evento especial</span>}
                 </div>
                 {session.my_waitlist_position != null && (
                   <div style={{ marginTop: '0.4rem', fontSize: '0.85rem', color: 'var(--color-muted)' }}>
-                    Si alguien cancela con tiempo, tu lugar se reserva solo y te avisamos.
-                    <div style={{ marginTop: '0.4rem' }}>
-                      <button
-                        type="button"
-                        className="btn btn-ghost btn-small"
-                        onClick={() => handleWaitlist(session.id, 'leave')}
-                        disabled={waitlistBusyId === session.id}
-                      >
-                        {waitlistBusyId === session.id ? 'Saliendo…' : 'Salir de la lista'}
-                      </button>
-                    </div>
+                    En lista de espera. Si alguien cancela con tiempo, tu lugar se reserva solo y te avisamos.
                   </div>
                 )}
                 {actionErrors[session.id] && <div className="error-banner">{actionErrors[session.id]}</div>}
@@ -155,6 +142,7 @@ export default function SchedulePage() {
                   onReserve={() => handleReserve(session.id)}
                   waitlistBusy={waitlistBusyId === session.id}
                   onJoinWaitlist={() => handleWaitlist(session.id, 'join')}
+                  onLeaveWaitlist={() => handleWaitlist(session.id, 'leave')}
                 />
               </div>
             </div>
@@ -171,7 +159,7 @@ const RESERVED_STATUS_LABELS = {
   no_show: 'No show',
 };
 
-function ReserveButton({ session, reserving, onReserve, waitlistBusy, onJoinWaitlist }) {
+function ReserveButton({ session, reserving, onReserve, waitlistBusy, onJoinWaitlist, onLeaveWaitlist }) {
   if (session.my_reservation_status && session.my_reservation_status !== 'cancelled') {
     return (
       <span className={`badge badge-status-${session.my_reservation_status}`}>
@@ -180,7 +168,11 @@ function ReserveButton({ session, reserving, onReserve, waitlistBusy, onJoinWait
     );
   }
   if (session.my_waitlist_position != null) {
-    return <span className="badge badge-accent">En espera</span>;
+    return (
+      <button type="button" className="btn btn-ghost btn-small" onClick={onLeaveWaitlist} disabled={waitlistBusy}>
+        {waitlistBusy ? 'Cancelando…' : 'Cancelar'}
+      </button>
+    );
   }
   if (session.spots_available <= 0) {
     if (session.can_join_waitlist) {

@@ -140,7 +140,7 @@ export default function MyReservationsPage() {
                   onClick={() => handleLeaveWaitlist(entry)}
                   disabled={leavingId === entry.id}
                 >
-                  {leavingId === entry.id ? 'Saliendo…' : 'Salir de la lista'}
+                  {leavingId === entry.id ? 'Cancelando…' : 'Cancelar'}
                 </button>
               </div>
             </div>
