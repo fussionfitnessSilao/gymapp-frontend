@@ -126,6 +126,10 @@ export default function SchedulePage() {
                 <div className="session-meta">
                   <span>{session.instructor_name}</span>
                   <CapacityDots capacity={session.capacity} spotsAvailable={session.spots_available} />
+                  {(session.my_waitlist_position != null ||
+                    (session.spots_available <= 0 && session.can_join_waitlist)) && (
+                    <span className="badge badge-accent">Lista de espera</span>
+                  )}
                   {session.is_special_event && <span className="badge badge-accent">Evento especial</span>}
                 </div>
                 {session.my_waitlist_position != null && (
@@ -167,29 +171,20 @@ function ReserveButton({ session, reserving, onReserve, waitlistBusy, onJoinWait
       </span>
     );
   }
-  const waitlistStack = (button) => (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.35rem' }}>
-      <span className="badge badge-accent" style={{ textAlign: 'center' }}>
-        Lista de espera
-      </span>
-      {button}
-    </div>
-  );
-
   if (session.my_waitlist_position != null) {
-    return waitlistStack(
+    return (
       <button type="button" className="btn btn-ghost btn-small" onClick={onLeaveWaitlist} disabled={waitlistBusy}>
         {waitlistBusy ? 'Cancelando…' : 'Cancelar'}
-      </button>,
+      </button>
     );
   }
   if (session.spots_available <= 0) {
     if (session.can_join_waitlist) {
-      // Igual que una reservación normal: botón "Reservar" y, encima, la etiqueta que aclara que es lista de espera.
-      return waitlistStack(
+      // Igual que una reservación normal; la etiqueta "Lista de espera" va junto al cupo, en la info de la clase.
+      return (
         <button type="button" className="btn btn-primary btn-small" onClick={onJoinWaitlist} disabled={waitlistBusy}>
           {waitlistBusy ? 'Reservando…' : 'Reservar'}
-        </button>,
+        </button>
       );
     }
     return (
