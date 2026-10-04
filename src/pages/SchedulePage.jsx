@@ -3,6 +3,7 @@ import CapacityDots from '../components/CapacityDots';
 import { createReservation } from '../api/reservations';
 import { fetchSessions } from '../api/sessions';
 import { joinWaitlist, leaveWaitlist } from '../api/waitlist';
+import { GENERAL_CANCELLATION_HOURS, hoursLabel } from '../cancellation';
 
 const ERROR_MESSAGES = {
   MEMBERSHIP_EXPIRED: 'No tienes una membresía vigente. Habla con recepción.',
@@ -130,6 +131,14 @@ export default function SchedulePage() {
                     (session.spots_available <= 0 && session.can_join_waitlist)) && (
                     <span className="badge badge-accent">Lista de espera</span>
                   )}
+                  {session.cancellation_window_hours != null &&
+                    session.cancellation_window_hours !== GENERAL_CANCELLATION_HOURS && (
+                      <span>
+                        {session.cancellation_window_hours === 0
+                          ? 'Puedes cancelar hasta que empiece'
+                          : `Cancela hasta ${hoursLabel(session.cancellation_window_hours)} antes`}
+                      </span>
+                    )}
                   {session.is_special_event && <span className="badge badge-accent">Evento especial</span>}
                 </div>
                 {session.my_waitlist_position != null && (

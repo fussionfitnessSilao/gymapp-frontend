@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { cancelReservation, fetchReservations } from '../api/reservations';
 import { fetchMyWaitlist, leaveWaitlist } from '../api/waitlist';
+import { cancellationHours, hoursLabel, timeLeftPhrase } from '../cancellation';
 
 const STATUS_LABELS = {
   confirmed: 'Confirmada',
@@ -67,7 +68,7 @@ export default function MyReservationsPage() {
       setResultMessage(
         updated.status === 'cancelled'
           ? 'Tu reservación se canceló sin penalización.'
-          : 'Se canceló fuera de la ventana de 2 horas, así que se registró como no-show.'
+          : `Se canceló fuera del límite de ${hoursLabel(cancellationHours(updated))}, así que se registró como no-show.`
       );
       await load(scope);
     } catch (err) {
@@ -150,7 +151,8 @@ export default function MyReservationsPage() {
       )}
 
       {reservations.map((reservation) => {
-        const withinWindow = hoursUntil(reservation.class_session_start) >= 2;
+        const windowHours = cancellationHours(reservation);
+        const withinWindow = hoursUntil(reservation.class_session_start) >= windowHours;
         return (
           <div className="card reservation-card" key={reservation.id}>
             <div className="reservation-card-top">
@@ -167,7 +169,7 @@ export default function MyReservationsPage() {
                   <div style={{ marginTop: '0.75rem' }}>
                     {!withinWindow && (
                       <p className="cancel-warning">
-                        Ya no se puede cancelar sin penalización — faltan menos de 2 horas para la clase.
+                        Ya no se puede cancelar sin penalización — {timeLeftPhrase(windowHours, false)}.
                       </p>
                     )}
                     <button type="button" className="btn btn-danger btn-small" onClick={() => setConfirmingId(reservation.id)}>
@@ -178,8 +180,8 @@ export default function MyReservationsPage() {
                   <div className={`cancel-confirm ${withinWindow ? 'within-window' : 'outside-window'}`}>
                     <p>
                       {withinWindow
-                        ? 'Puedes cancelar sin penalización — faltan más de 2 horas para la clase.'
-                        : 'Faltan menos de 2 horas para la clase: cancelar ahora se registrará como no-show y no se reembolsará tu clase.'}
+                        ? `Puedes cancelar sin penalización — ${timeLeftPhrase(windowHours, true)}.`
+                        : `Ya no estás a tiempo (${timeLeftPhrase(windowHours, false)}): cancelar ahora se registrará como no-show y no se reembolsará tu clase.`}
                     </p>
                     <div className="cancel-confirm-actions">
                       <button
