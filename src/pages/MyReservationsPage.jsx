@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { cancelReservation, fetchReservations } from '../api/reservations';
 import { fetchMyWaitlist, leaveWaitlist } from '../api/waitlist';
-import { cancellationHours, hoursLabel, timeLeftPhrase } from '../cancellation';
+import { cancellationHours, describeCancellation, useNow } from '../cancellation';
 
 const STATUS_LABELS = {
   confirmed: 'Confirmada',
@@ -21,15 +21,12 @@ function formatDateTime(dateStr) {
   });
 }
 
-function hoursUntil(dateStr) {
-  return (new Date(dateStr).getTime() - Date.now()) / (1000 * 60 * 60);
-}
-
 export default function MyReservationsPage() {
   const [scope, setScope] = useState('upcoming');
   const [reservations, setReservations] = useState([]);
   const [waitlist, setWaitlist] = useState([]);
   const [leavingId, setLeavingId] = useState(null);
+  const now = useNow();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [confirmingId, setConfirmingId] = useState(null);
@@ -68,7 +65,7 @@ export default function MyReservationsPage() {
       setResultMessage(
         updated.status === 'cancelled'
           ? 'Tu reservación se canceló sin penalización.'
-          : `Se canceló fuera del límite de ${hoursLabel(cancellationHours(updated))}, así que se registró como no-show.`
+          : 'Se canceló fuera del límite para cancelar sin penalización, así que se registró como no-show.'
       );
       await load(scope);
     } catch (err) {
@@ -151,8 +148,12 @@ export default function MyReservationsPage() {
       )}
 
       {reservations.map((reservation) => {
-        const windowHours = cancellationHours(reservation);
-        const withinWindow = hoursUntil(reservation.class_session_start) >= windowHours;
+        const cancellation = describeCancellation(
+          reservation.class_session_start,
+          cancellationHours(reservation),
+          now
+        );
+        const withinWindow = cancellation.open;
         return (
           <div className="card reservation-card" key={reservation.id}>
             <div className="reservation-card-top">
@@ -167,9 +168,13 @@ export default function MyReservationsPage() {
               <>
                 {confirmingId !== reservation.id ? (
                   <div style={{ marginTop: '0.75rem' }}>
-                    {!withinWindow && (
+                    {withinWindow ? (
+                      <p style={{ margin: '0 0 0.5rem', fontSize: '0.85rem', color: 'var(--color-muted)' }}>
+                        {cancellation.text}.
+                      </p>
+                    ) : (
                       <p className="cancel-warning">
-                        Ya no se puede cancelar sin penalización — {timeLeftPhrase(windowHours, false)}.
+                        Ya pasó el límite para cancelar sin penalización ({cancellation.deadlineText}).
                       </p>
                     )}
                     <button type="button" className="btn btn-danger btn-small" onClick={() => setConfirmingId(reservation.id)}>
@@ -180,8 +185,8 @@ export default function MyReservationsPage() {
                   <div className={`cancel-confirm ${withinWindow ? 'within-window' : 'outside-window'}`}>
                     <p>
                       {withinWindow
-                        ? `Puedes cancelar sin penalización — ${timeLeftPhrase(windowHours, true)}.`
-                        : `Ya no estás a tiempo (${timeLeftPhrase(windowHours, false)}): cancelar ahora se registrará como no-show y no se reembolsará tu clase.`}
+                        ? `${cancellation.text}.`
+                        : 'Ya pasó el límite para cancelar sin penalización: cancelar ahora se registrará como no-show y no se reembolsará tu clase.'}
                     </p>
                     <div className="cancel-confirm-actions">
                       <button

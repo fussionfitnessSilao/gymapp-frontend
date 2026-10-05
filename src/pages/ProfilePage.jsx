@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { fetchCheckinToken, fetchMe, updateMe } from '../api/auth';
 import { fetchMyMembership } from '../api/membership';
 import { useAuth } from '../context/AuthContext';
+import { isInstalledApp } from '../pwa';
 
 const MEMBERSHIP_STATUS_LABELS = {
   active: 'Activa',
@@ -157,6 +158,18 @@ export default function ProfilePage() {
             </button>
           </form>
         </div>
+
+        {!isInstalledApp() && (
+          <div className="card" style={{ marginBottom: '1rem' }}>
+            <h3 style={{ margin: '0 0 0.25rem' }}>Instalar la app</h3>
+            <p style={{ margin: '0 0 0.75rem', fontSize: '0.9rem', color: 'var(--color-muted)' }}>
+              Agrégala a la pantalla de inicio de tu celular para abrirla como cualquier otra app.
+            </p>
+            <Link className="btn btn-ghost btn-small" to="/instalar">
+              Ver cómo instalarla
+            </Link>
+          </div>
+        )}
 
         <button type="button" className="btn btn-ghost" onClick={handleLogout}>
           Cerrar sesión

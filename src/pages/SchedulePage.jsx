@@ -3,7 +3,7 @@ import CapacityDots from '../components/CapacityDots';
 import { createReservation } from '../api/reservations';
 import { fetchSessions } from '../api/sessions';
 import { joinWaitlist, leaveWaitlist } from '../api/waitlist';
-import { GENERAL_CANCELLATION_HOURS, hoursLabel } from '../cancellation';
+import { GENERAL_CANCELLATION_HOURS, describeCancellation, useNow } from '../cancellation';
 
 const ERROR_MESSAGES = {
   MEMBERSHIP_EXPIRED: 'No tienes una membresía vigente. Habla con recepción.',
@@ -41,6 +41,7 @@ export default function SchedulePage() {
   const [actionErrors, setActionErrors] = useState({});
   const [reservingId, setReservingId] = useState(null);
   const [waitlistBusyId, setWaitlistBusyId] = useState(null);
+  const now = useNow();
 
   async function loadSessions() {
     setLoading(true);
@@ -131,14 +132,7 @@ export default function SchedulePage() {
                     (session.spots_available <= 0 && session.can_join_waitlist)) && (
                     <span className="badge badge-accent">Lista de espera</span>
                   )}
-                  {session.cancellation_window_hours != null &&
-                    session.cancellation_window_hours !== GENERAL_CANCELLATION_HOURS && (
-                      <span>
-                        {session.cancellation_window_hours === 0
-                          ? 'Puedes cancelar hasta que empiece'
-                          : `Cancela hasta ${hoursLabel(session.cancellation_window_hours)} antes`}
-                      </span>
-                    )}
+                  <CancellationHint session={session} now={now} />
                   {session.is_special_event && <span className="badge badge-accent">Evento especial</span>}
                 </div>
                 {session.my_waitlist_position != null && (
@@ -171,6 +165,15 @@ const RESERVED_STATUS_LABELS = {
   attended: 'Asististe',
   no_show: 'No show',
 };
+
+// Solo para clases con un límite distinto al general: hasta cuándo (o cuánto falta) para cancelar sin penalización.
+function CancellationHint({ session, now }) {
+  if (session.cancellation_window_hours == null || session.cancellation_window_hours === GENERAL_CANCELLATION_HOURS) {
+    return null;
+  }
+  const { short } = describeCancellation(session.start_datetime, session.cancellation_window_hours, now);
+  return short ? <span>{short}</span> : null;
+}
 
 function ReserveButton({ session, reserving, onReserve, waitlistBusy, onJoinWaitlist, onLeaveWaitlist }) {
   if (session.my_reservation_status && session.my_reservation_status !== 'cancelled') {
