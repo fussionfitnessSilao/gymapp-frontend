@@ -3,7 +3,12 @@ import CapacityDots from '../components/CapacityDots';
 import { createReservation } from '../api/reservations';
 import { fetchSessions } from '../api/sessions';
 import { joinWaitlist, leaveWaitlist } from '../api/waitlist';
-import { GENERAL_CANCELLATION_HOURS, describeCancellation, useNow } from '../cancellation';
+import {
+  GENERAL_CANCELLATION_HOURS,
+  describeBookingClose,
+  describeCancellation,
+  useNow,
+} from '../cancellation';
 
 const ERROR_MESSAGES = {
   MEMBERSHIP_EXPIRED: 'No tienes una membresía vigente. Habla con recepción.',
@@ -128,13 +133,9 @@ export default function SchedulePage() {
                 <div className="session-meta">
                   <span>{session.instructor_name}</span>
                   <CapacityDots capacity={session.capacity} spotsAvailable={session.spots_available} />
-                  {(session.my_waitlist_position != null ||
-                    (session.spots_available <= 0 && session.can_join_waitlist)) && (
-                    <span className="badge badge-accent">Lista de espera</span>
-                  )}
-                  <CancellationHint session={session} now={now} />
                   {session.is_special_event && <span className="badge badge-accent">Evento especial</span>}
                 </div>
+                <SessionNotices session={session} now={now} />
                 {session.my_waitlist_position != null && (
                   <div style={{ marginTop: '0.4rem', fontSize: '0.85rem', color: 'var(--color-muted)' }}>
                     En lista de espera. Si alguien cancela con tiempo, tu lugar se reserva solo y te avisamos.
@@ -166,13 +167,46 @@ const RESERVED_STATUS_LABELS = {
   no_show: 'No show',
 };
 
-// Solo para clases con un límite distinto al general: hasta cuándo (o cuánto falta) para cancelar sin penalización.
-function CancellationHint({ session, now }) {
-  if (session.cancellation_window_hours == null || session.cancellation_window_hours === GENERAL_CANCELLATION_HOURS) {
-    return null;
+// Debajo del semáforo de cupo (en su propia línea, para que no se encime en pantallas chicas): la etiqueta de
+// lista de espera y un aviso de tiempo. Quien ya tiene reservación o lista de espera ve hasta cuándo puede cancelar
+// (solo si la clase tiene un límite distinto al general); quien solo mira ve cuándo cierran los registros, si la
+// clase los restringe.
+function SessionNotices({ session, now }) {
+  const waitlistTag =
+    session.my_waitlist_position != null || (session.spots_available <= 0 && session.can_join_waitlist);
+  const hasMine =
+    (session.my_reservation_status && session.my_reservation_status !== 'cancelled') ||
+    session.my_waitlist_position != null;
+
+  let hint = null;
+  if (hasMine) {
+    const custom =
+      session.cancellation_window_hours != null &&
+      session.cancellation_window_hours !== GENERAL_CANCELLATION_HOURS;
+    if (custom) {
+      hint = describeCancellation(session.start_datetime, session.cancellation_window_hours, now).short;
+    }
+  } else if (session.close_bookings_at_window && !session.booking_closed && session.bookings_close_at) {
+    hint = describeBookingClose(session.bookings_close_at, now);
   }
-  const { short } = describeCancellation(session.start_datetime, session.cancellation_window_hours, now);
-  return short ? <span>{short}</span> : null;
+
+  if (!waitlistTag && !hint) return null;
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        gap: '0.4rem',
+        marginTop: '0.35rem',
+        fontSize: '0.85rem',
+        color: 'var(--color-muted)',
+      }}
+    >
+      {waitlistTag && <span className="badge badge-accent">Lista de espera</span>}
+      {hint && <span>{hint}</span>}
+    </div>
+  );
 }
 
 function ReserveButton({ session, reserving, onReserve, waitlistBusy, onJoinWaitlist, onLeaveWaitlist }) {
@@ -187,6 +221,13 @@ function ReserveButton({ session, reserving, onReserve, waitlistBusy, onJoinWait
     return (
       <button type="button" className="btn btn-ghost btn-small" onClick={onLeaveWaitlist} disabled={waitlistBusy}>
         {waitlistBusy ? 'Cancelando…' : 'Cancelar'}
+      </button>
+    );
+  }
+  if (session.booking_closed) {
+    return (
+      <button type="button" className="btn btn-ghost btn-small" disabled>
+        Cerrado
       </button>
     );
   }

@@ -7,18 +7,44 @@ function detectPlatform() {
   return 'other';
 }
 
+// Cada paso puede llevar una captura de pantalla opcional: se guardan en public/capturas/ (se sirven desde
+// /capturas/...). Si el archivo no existe, el paso se muestra solo con su texto.
 const STEPS = {
   ios: [
-    'Abre este sitio en Safari (no funciona igual en Chrome dentro de iPhone/iPad).',
-    'Toca el ícono de compartir — el cuadrito con la flecha hacia arriba, abajo al centro de la pantalla.',
-    'Desliza la lista de opciones y toca "Agregar a inicio".',
-    'Toca "Agregar" arriba a la derecha. Listo — el ícono aparece en tu pantalla de inicio como una app.',
+    {
+      text: 'Abre este sitio en Safari (no funciona igual en Chrome dentro de iPhone/iPad).',
+      image: '/capturas/ios-1.png',
+    },
+    {
+      text: 'Toca el ícono de compartir — el cuadrito con la flecha hacia arriba, abajo al centro de la pantalla.',
+      image: '/capturas/ios-2.png',
+    },
+    {
+      text: 'Desliza la lista de opciones y toca "Agregar a inicio".',
+      image: '/capturas/ios-3.png',
+    },
+    {
+      text: 'Toca "Agregar" arriba a la derecha. Listo — el ícono aparece en tu pantalla de inicio como una app.',
+      image: '/capturas/ios-4.png',
+    },
   ],
   android: [
-    'Abre este sitio en Chrome.',
-    'Toca los tres puntos (⋮) arriba a la derecha, el menú de Chrome.',
-    'Toca "Agregar a pantalla de inicio" (o "Instalar app", según tu versión de Chrome).',
-    'Confirma tocando "Agregar" o "Instalar". Listo — el ícono aparece en tu pantalla de inicio.',
+    {
+      text: 'Abre este sitio en Chrome.',
+      image: '/capturas/android-1.png',
+    },
+    {
+      text: 'Toca los tres puntos (⋮) arriba a la derecha, el menú de Chrome.',
+      image: '/capturas/android-2.png',
+    },
+    {
+      text: 'Toca "Agregar a pantalla de inicio" (o "Instalar app", según tu versión de Chrome).',
+      image: '/capturas/android-3.png',
+    },
+    {
+      text: 'Confirma tocando "Agregar" o "Instalar". Listo — el ícono aparece en tu pantalla de inicio.',
+      image: '/capturas/android-4.png',
+    },
   ],
 };
 
@@ -57,8 +83,24 @@ export default function InstallGuidePage() {
         {steps ? (
           <ol style={{ paddingLeft: '1.25rem', lineHeight: 1.7 }}>
             {steps.map((step, index) => (
-              <li key={index} style={{ marginBottom: '0.5rem' }}>
-                {step}
+              <li key={index} style={{ marginBottom: '1rem' }}>
+                {step.text}
+                <img
+                  src={step.image}
+                  alt={`Captura del paso ${index + 1}`}
+                  loading="lazy"
+                  onError={(event) => {
+                    event.currentTarget.style.display = 'none';
+                  }}
+                  style={{
+                    display: 'block',
+                    width: '100%',
+                    maxWidth: 260,
+                    marginTop: '0.5rem',
+                    borderRadius: 12,
+                    border: '1px solid var(--color-border, #ddd)',
+                  }}
+                />
               </li>
             ))}
           </ol>

@@ -66,3 +66,14 @@ export function describeCancellation(startDateStr, hours, now) {
     short: `Cancela hasta ${deadlineText}`,
   };
 }
+
+// Para quien solo mira el horario: cuándo cierran las reservaciones de una clase que las restringe
+// (`bookings_close_at`, que manda la API). Menos de 24 h: cuenta regresiva; si no, la hora exacta.
+// Devuelve null si ya cerraron.
+export function describeBookingClose(closesAtStr, now) {
+  const closesAt = new Date(closesAtStr);
+  const msLeft = closesAt.getTime() - now;
+  if (msLeft <= 0) return null;
+  if (msLeft < DAY_MS) return `Registros se cierran en ${formatRemaining(msLeft)}`;
+  return `Registros se cierran el ${formatDeadline(closesAt)}`;
+}
