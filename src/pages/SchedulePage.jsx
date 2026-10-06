@@ -150,7 +150,6 @@ export default function SchedulePage() {
                   onReserve={() => handleReserve(session.id)}
                   waitlistBusy={waitlistBusyId === session.id}
                   onJoinWaitlist={() => handleWaitlist(session.id, 'join')}
-                  onLeaveWaitlist={() => handleWaitlist(session.id, 'leave')}
                 />
               </div>
             </div>
@@ -172,8 +171,9 @@ const RESERVED_STATUS_LABELS = {
 // (solo si la clase tiene un límite distinto al general); quien solo mira ve cuándo cierran los registros, si la
 // clase los restringe.
 function SessionNotices({ session, now }) {
-  const waitlistTag =
-    session.my_waitlist_position != null || (session.spots_available <= 0 && session.can_join_waitlist);
+  // La etiqueta "Lista de espera" avisa que el botón "Reservar" te anotaría en la fila; si ya estás en ella,
+  // la etiqueta "En fila" va a la derecha y esta sobra.
+  const waitlistTag = session.my_waitlist_position == null && session.spots_available <= 0 && session.can_join_waitlist;
   const hasMine =
     (session.my_reservation_status && session.my_reservation_status !== 'cancelled') ||
     session.my_waitlist_position != null;
@@ -209,7 +209,7 @@ function SessionNotices({ session, now }) {
   );
 }
 
-function ReserveButton({ session, reserving, onReserve, waitlistBusy, onJoinWaitlist, onLeaveWaitlist }) {
+function ReserveButton({ session, reserving, onReserve, waitlistBusy, onJoinWaitlist }) {
   if (session.my_reservation_status && session.my_reservation_status !== 'cancelled') {
     return (
       <span className={`badge badge-status-${session.my_reservation_status}`}>
@@ -218,11 +218,8 @@ function ReserveButton({ session, reserving, onReserve, waitlistBusy, onJoinWait
     );
   }
   if (session.my_waitlist_position != null) {
-    return (
-      <button type="button" className="btn btn-ghost btn-small" onClick={onLeaveWaitlist} disabled={waitlistBusy}>
-        {waitlistBusy ? 'Cancelando…' : 'Cancelar'}
-      </button>
-    );
+    // Salir de la lista se hace desde "Mis reservaciones"; aquí solo se indica que ya estás anotado.
+    return <span className="badge badge-accent">En fila</span>;
   }
   if (session.booking_closed) {
     return (
