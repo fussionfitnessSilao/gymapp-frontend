@@ -27,8 +27,9 @@ export const HEARD_ABOUT_OPTIONS = [
   { value: 'other', label: 'Otro' },
 ];
 
-// Dirección pública del aviso de privacidad (se define al publicarlo; ver VITE_PRIVACY_NOTICE_URL).
-export const PRIVACY_NOTICE_URL = import.meta.env.VITE_PRIVACY_NOTICE_URL || '';
+// El aviso de privacidad vive en la propia app (/privacidad, texto en src/content/aviso-privacidad.md).
+// Si algún día se publica en otro sitio, VITE_PRIVACY_NOTICE_URL tiene prioridad.
+export const PRIVACY_NOTICE_URL = import.meta.env.VITE_PRIVACY_NOTICE_URL || '/privacidad';
 
 // Debe coincidir con MIN_CLIENT_AGE y ADULT_AGE del backend (apps/accounts/models.py).
 export const MIN_AGE = 16;

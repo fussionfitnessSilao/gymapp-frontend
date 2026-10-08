@@ -7,6 +7,7 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import InstallGuidePage from './pages/InstallGuidePage';
 import LoginPage from './pages/LoginPage';
 import MyReservationsPage from './pages/MyReservationsPage';
+import PrivacyPage from './pages/PrivacyPage';
 import ProfilePage from './pages/ProfilePage';
 import RegisterPage from './pages/RegisterPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
@@ -24,6 +25,7 @@ export default function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/instalar" element={<InstallGuidePage />} />
+          <Route path="/privacidad" element={<PrivacyPage />} />
           <Route
             path="/schedule"
             element={
