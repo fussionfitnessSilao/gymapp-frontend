@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { fetchCheckinToken, fetchMe, updateMe } from '../api/auth';
 import { fetchMyMembership } from '../api/membership';
+import ClientDataCard from '../components/ClientDataCard';
 import { useAuth } from '../context/AuthContext';
 import { isInstalledApp } from '../pwa';
 
@@ -13,8 +14,9 @@ const MEMBERSHIP_STATUS_LABELS = {
 };
 
 export default function ProfilePage() {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { hash } = useLocation();
   const [profile, setProfile] = useState(null);
   const [membership, setMembership] = useState(null);
   const [membershipMessage, setMembershipMessage] = useState(null);
@@ -50,6 +52,13 @@ export default function ProfilePage() {
     }
     load();
   }, []);
+
+  useEffect(() => {
+    // La invitación a completar datos enlaza a /profile#mis-datos: una vez cargada la página, baja a esa tarjeta.
+    if (!loading && hash === '#mis-datos') {
+      document.getElementById('mis-datos')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [loading, hash]);
 
   function handleChange(field) {
     return (event) => setForm((prev) => ({ ...prev, [field]: event.target.value }));
@@ -158,6 +167,8 @@ export default function ProfilePage() {
             </button>
           </form>
         </div>
+
+        {user?.role === 'client' && <ClientDataCard />}
 
         {!isInstalledApp() && (
           <div className="card" style={{ marginBottom: '1rem' }}>

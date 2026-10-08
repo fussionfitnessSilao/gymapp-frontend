@@ -531,3 +531,127 @@ input:focus {
 .membership-detail-row .label {
   color: var(--color-muted);
 }
+
+/* ---- Registro por pasos y datos del cliente ---- */
+
+textarea,
+select {
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  width: 100%;
+}
+
+textarea {
+  resize: vertical;
+}
+
+textarea:focus,
+select:focus {
+  border-color: var(--color-primary);
+}
+
+input[type='checkbox'],
+input[type='radio'] {
+  width: auto;
+  flex: none;
+  margin: 0.2rem 0 0;
+  accent-color: var(--color-primary);
+}
+
+.steps {
+  display: flex;
+  gap: 0.35rem;
+  margin-bottom: 1.25rem;
+}
+
+.step-bar {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-border);
+}
+
+.step-bar.done {
+  background: var(--color-primary);
+}
+
+.hint {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.choice-fieldset {
+  border: none;
+  padding: 0;
+  margin-left: 0;
+  margin-right: 0;
+  min-width: 0;
+}
+
+.choice-fieldset legend {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-muted);
+  padding: 0;
+  margin-bottom: 0.35rem;
+}
+
+.choice-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+}
+
+.choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.choice a {
+  color: var(--color-primary);
+}
+
+.guardian-box {
+  background: var(--color-bg);
+  border-radius: 8px;
+  padding: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.guardian-box input:not([type='checkbox']) {
+  background: var(--color-surface);
+}
+
+.info-banner {
+  background: #f6f1de;
+  border-radius: 8px;
+  padding: 0.75rem 0.9rem;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.info-banner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.65rem;
+}
+
+.complete-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background: #f6f1de;
+  padding: 0.6rem 1rem;
+  font-size: 0.9rem;
+}

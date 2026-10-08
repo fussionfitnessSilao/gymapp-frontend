@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
+import CompleteProfileBanner from './components/CompleteProfileBanner';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
@@ -16,6 +17,7 @@ export default function App() {
     <AuthProvider>
       <div className="app-shell">
         <Navbar />
+        <CompleteProfileBanner />
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
