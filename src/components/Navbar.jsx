@@ -14,7 +14,7 @@ export default function Navbar() {
           Horario
         </NavLink>
         <NavLink to="/reservations" className={({ isActive }) => `navbar-link${isActive ? ' active' : ''}`}>
-          Mis reservas
+          Mis reservaciones
         </NavLink>
         <NavLink to="/profile" className={({ isActive }) => `navbar-link${isActive ? ' active' : ''}`}>
           Perfil

@@ -109,6 +109,11 @@ button {
   .navbar {
     padding: 0.75rem 1rem;
     gap: 0.4rem;
+    flex-wrap: wrap; /* "Mis reservaciones" es más largo: si no cabe junto al nombre, los enlaces pasan a otra línea */
+  }
+
+  .navbar-links {
+    margin-left: auto;
   }
 
   .navbar-brand {

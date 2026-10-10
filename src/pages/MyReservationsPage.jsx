@@ -127,7 +127,7 @@ export default function MyReservationsPage() {
 
       {reservations.length === 0 && waitlist.length === 0 && !error && (
         <div className="empty-state">
-          <h3>{scope === 'upcoming' ? 'No tienes reservas próximas' : 'Aún no tienes historial'}</h3>
+          <h3>{scope === 'upcoming' ? 'No tienes reservaciones próximas' : 'Aún no tienes historial'}</h3>
           <p>{scope === 'upcoming' ? 'Ve al horario para reservar tu próxima clase.' : 'Tus clases pasadas van a aparecer aquí.'}</p>
         </div>
       )}
