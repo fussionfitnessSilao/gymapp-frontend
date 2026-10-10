@@ -3,12 +3,28 @@ import { cancelReservation, fetchReservations } from '../api/reservations';
 import { fetchMyWaitlist, leaveWaitlist } from '../api/waitlist';
 import { cancellationHours, describeCancellation, useNow } from '../cancellation';
 
+// Debe coincidir con HOLD_RELEASE_HOURS del backend (apps/reservations/fixed_classes.py): un lugar provisional se
+// guarda hasta estas horas antes de la clase si la membresía no se renueva.
+const HOLD_RELEASE_HOURS = 12;
+
 const STATUS_LABELS = {
   confirmed: 'Confirmada',
   cancelled: 'Cancelada',
   no_show: 'No show',
   attended: 'Asistió',
 };
+
+function renewalDeadlineText(classStart) {
+  const deadline = new Date(new Date(classStart).getTime() - HOLD_RELEASE_HOURS * 60 * 60 * 1000);
+  return deadline.toLocaleString('es-MX', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+}
 
 function formatDateTime(dateStr) {
   return new Date(dateStr).toLocaleString('es-MX', {
@@ -161,8 +177,22 @@ export default function MyReservationsPage() {
                 <h3>{reservation.class_session_name}</h3>
                 <div className="reservation-date">{formatDateTime(reservation.class_session_start)}</div>
               </div>
-              <span className={`badge badge-status-${reservation.status}`}>{STATUS_LABELS[reservation.status]}</span>
+              <div className="badge-group">
+                <span className={`badge badge-status-${reservation.status}`}>{STATUS_LABELS[reservation.status]}</span>
+                {reservation.fixed_seat && (
+                  <span className="badge badge-fixed">
+                    {reservation.fixed_provisional ? 'Lugar fijo · por renovar' : 'Lugar fijo'}
+                  </span>
+                )}
+              </div>
             </div>
+
+            {scope === 'upcoming' && reservation.status === 'confirmed' && reservation.fixed_provisional && (
+              <p style={{ margin: '0.5rem 0 0', fontSize: '0.85rem', color: 'var(--color-muted)' }}>
+                Te guardamos tu lugar. Renueva tu membresía antes del {renewalDeadlineText(reservation.class_session_start)} para
+                conservarlo.
+              </p>
+            )}
 
             {scope === 'upcoming' && reservation.status === 'confirmed' && (
               <>
