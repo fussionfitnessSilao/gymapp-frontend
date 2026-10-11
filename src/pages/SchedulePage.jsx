@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import CapacityDots from '../components/CapacityDots';
+import MakeupBanner from '../components/MakeupBanner';
 import { createReservation } from '../api/reservations';
 import { fetchSessions } from '../api/sessions';
 import { joinWaitlist, leaveWaitlist } from '../api/waitlist';
@@ -15,6 +16,7 @@ const ERROR_MESSAGES = {
   NO_CLASSES_REMAINING: 'No te quedan clases en tu paquete actual.',
   SESSION_FULL: 'Esta clase ya no tiene cupo.',
   ALREADY_RESERVED: 'Ya tienes una reservación para esta clase.',
+  FIXED_SCHEDULE_ONLY: 'Tu membresía de horario fijo incluye tus clases fijas y los eventos especiales.',
 };
 
 function formatDayLabel(dateStr) {
@@ -46,6 +48,7 @@ export default function SchedulePage() {
   const [actionErrors, setActionErrors] = useState({});
   const [reservingId, setReservingId] = useState(null);
   const [waitlistBusyId, setWaitlistBusyId] = useState(null);
+  const [makeupRefresh, setMakeupRefresh] = useState(0);
   const now = useNow();
 
   async function loadSessions() {
@@ -76,6 +79,7 @@ export default function SchedulePage() {
     setActionErrors((prev) => ({ ...prev, [sessionId]: null }));
     try {
       await createReservation(sessionId);
+      setMakeupRefresh((value) => value + 1); // por si se usó una reposición
       await loadSessions();
     } catch (err) {
       setActionErrors((prev) => ({
@@ -112,6 +116,8 @@ export default function SchedulePage() {
       <div className="page-header">
         <p>Las próximas clases.</p>
       </div>
+
+      <MakeupBanner refreshKey={makeupRefresh} />
 
       {loadError && <div className="error-banner">{loadError}</div>}
 

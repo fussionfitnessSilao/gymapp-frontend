@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { cancelReservation, fetchReservations } from '../api/reservations';
 import { fetchMyWaitlist, leaveWaitlist } from '../api/waitlist';
 import { cancellationHours, describeCancellation, useNow } from '../cancellation';
+import MakeupBanner from '../components/MakeupBanner';
 
 // Debe coincidir con HOLD_RELEASE_HOURS del backend (apps/reservations/fixed_classes.py): un lugar provisional se
 // guarda hasta estas horas antes de la clase si la membresía no se renueva.
@@ -13,6 +14,12 @@ const STATUS_LABELS = {
   no_show: 'No show',
   attended: 'Asistió',
 };
+
+function statusLabel(reservation) {
+  // Una clase que canceló el estudio no es una cancelación del cliente.
+  if (reservation.status === 'cancelled' && reservation.cancelled_by_studio) return 'Clase cancelada';
+  return STATUS_LABELS[reservation.status];
+}
 
 function renewalDeadlineText(classStart) {
   const deadline = new Date(new Date(classStart).getTime() - HOLD_RELEASE_HOURS * 60 * 60 * 1000);
@@ -118,6 +125,8 @@ export default function MyReservationsPage() {
         </button>
       </div>
 
+      {scope === 'upcoming' && <MakeupBanner refreshKey={reservations.length} />}
+
       {error && <div className="error-banner">{error}</div>}
       {resultMessage && (
         <div className="error-banner" style={{ background: '#e8f0ec', color: 'var(--color-primary-dark)' }}>
@@ -178,7 +187,8 @@ export default function MyReservationsPage() {
                 <div className="reservation-date">{formatDateTime(reservation.class_session_start)}</div>
               </div>
               <div className="badge-group">
-                <span className={`badge badge-status-${reservation.status}`}>{STATUS_LABELS[reservation.status]}</span>
+                <span className={`badge badge-status-${reservation.status}`}>{statusLabel(reservation)}</span>
+                {reservation.is_makeup && <span className="badge badge-fixed">Reposición</span>}
                 {reservation.fixed_seat && (
                   <span className="badge badge-fixed">
                     {reservation.fixed_provisional ? 'Lugar fijo · por renovar' : 'Lugar fijo'}
