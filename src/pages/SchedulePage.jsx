@@ -16,7 +16,7 @@ const ERROR_MESSAGES = {
   NO_CLASSES_REMAINING: 'No te quedan clases en tu paquete actual.',
   SESSION_FULL: 'Esta clase ya no tiene cupo.',
   ALREADY_RESERVED: 'Ya tienes una reservación para esta clase.',
-  FIXED_SCHEDULE_ONLY: 'Tu membresía de horario fijo incluye tus clases fijas y los eventos especiales.',
+  FIXED_SCHEDULE_ONLY: 'Esta clase no forma parte de tu horario fijo.',
 };
 
 function formatDayLabel(dateStr) {
@@ -147,7 +147,6 @@ export default function SchedulePage() {
                     En lista de espera. Si alguien cancela con tiempo, tu lugar se reserva solo y te avisamos.
                   </div>
                 )}
-                {actionErrors[session.id] && <div className="error-banner">{actionErrors[session.id]}</div>}
               </div>
               <div className="session-actions">
                 <ReserveButton
@@ -158,6 +157,7 @@ export default function SchedulePage() {
                   onJoinWaitlist={() => handleWaitlist(session.id, 'join')}
                 />
               </div>
+              {actionErrors[session.id] && <div className="error-banner session-error">{actionErrors[session.id]}</div>}
             </div>
           ))}
         </div>

@@ -114,6 +114,12 @@ export default function MyReservationsPage() {
 
   if (loading) return <div className="page-loading">Cargando…</div>;
 
+  // Próximas: de la más cercana a la más lejana. Pasadas: de la más reciente a la más antigua.
+  const ordered = [...reservations].sort((a, b) => {
+    const diff = new Date(a.class_session_start) - new Date(b.class_session_start);
+    return scope === 'upcoming' ? diff : -diff;
+  });
+
   return (
     <div className="page">
       <div className="tabs">
@@ -172,7 +178,7 @@ export default function MyReservationsPage() {
         </>
       )}
 
-      {reservations.map((reservation) => {
+      {ordered.map((reservation) => {
         const cancellation = describeCancellation(
           reservation.class_session_start,
           cancellationHours(reservation),

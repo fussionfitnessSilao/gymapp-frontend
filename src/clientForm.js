@@ -67,8 +67,10 @@ export const EMPTY_PROFILE_FORM = {
   training_goals: [],
   heard_about: '',
   heard_about_other: '',
+  activities_other: '',
+  goals_other: '',
   comments: '',
-  marketing_opt_in: false,
+  marketing_opt_in: true,
 };
 
 export const EMPTY_HEALTH = { has_condition: null, details: '' };
@@ -89,6 +91,8 @@ export function pickPayload(form, keys) {
     let value = form[key];
     if (key === 'birth_date' && value === '') value = null;
     if (key === 'heard_about_other' && form.heard_about !== 'other') value = '';
+    if (key === 'activities_other' && !form.activities_of_interest.includes('other')) value = '';
+    if (key === 'goals_other' && !form.training_goals.includes('other')) value = '';
     payload[key] = value;
   }
   return payload;
@@ -102,6 +106,94 @@ export const PREFERENCE_KEYS = [
   'training_goals',
   'heard_about',
   'heard_about_other',
+  'activities_other',
+  'goals_other',
   'comments',
   'marketing_opt_in',
 ];
+
+// ---- Deportes practicados: los más comunes, en orden alfabético ----
+export const SPORT_OPTIONS = [
+  'Atletismo',
+  'Baile',
+  'Básquetbol',
+  'Box',
+  'Ciclismo',
+  'CrossFit',
+  'Fútbol',
+  'Gimnasia',
+  'Natación',
+  'Pilates',
+  'Running',
+  'Spinning',
+  'Tenis',
+  'Voleibol',
+  'Yoga',
+  'Zumba',
+].sort((a, b) => a.localeCompare(b, 'es'));
+
+/** "Yoga, Natación" -> ['Yoga', 'Natación'] (el backend guarda los deportes como un solo texto). */
+export function splitSports(value) {
+  return (value || '')
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+export function joinSports(list) {
+  return list.join(', ');
+}
+
+// ---- Calzado: del 21 al 32, con media talla u "Otro" ----
+export const SHOE_SIZES = Array.from({ length: 12 }, (_, index) => String(21 + index));
+
+/** Interpreta el calzado guardado: { mode: '' | 'size' | 'other', size, half, other }. */
+export function parseShoeSize(value) {
+  const text = (value || '').trim();
+  if (!text) return { mode: '', size: '', half: false, other: '' };
+  const match = text.match(/^(\d{2})(\.5)?$/);
+  if (match && SHOE_SIZES.includes(match[1])) return { mode: 'size', size: match[1], half: Boolean(match[2]), other: '' };
+  return { mode: 'other', size: '', half: false, other: text };
+}
+
+export function buildShoeSize({ size, half }) {
+  return size ? `${size}${half ? '.5' : ''}` : '';
+}
+
+// ---- Fecha de nacimiento en tres listas (día, mes, año) ----
+export const MONTHS = [
+  'Enero',
+  'Febrero',
+  'Marzo',
+  'Abril',
+  'Mayo',
+  'Junio',
+  'Julio',
+  'Agosto',
+  'Septiembre',
+  'Octubre',
+  'Noviembre',
+  'Diciembre',
+];
+
+/** Años de nacimiento a elegir: del año de quien hoy cumple 16 hacia atrás, hasta 1930. */
+export function birthYearOptions(extraYear) {
+  const newest = new Date().getFullYear() - MIN_AGE;
+  const years = [];
+  for (let year = newest; year >= 1930; year -= 1) years.push(String(year));
+  if (extraYear && !years.includes(String(extraYear))) years.unshift(String(extraYear));
+  return years;
+}
+
+export function splitDate(iso) {
+  const [year = '', month = '', day = ''] = (iso || '').split('-');
+  return { year, month: month ? String(Number(month)) : '', day: day ? String(Number(day)) : '' };
+}
+
+/** Une día, mes y año en AAAA-MM-DD; vacío mientras falte alguno o la fecha no exista (31 de febrero). */
+export function joinDate({ year, month, day }) {
+  if (!year || !month || !day) return '';
+  const date = new Date(Number(year), Number(month) - 1, Number(day));
+  if (date.getMonth() !== Number(month) - 1) return '';
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}

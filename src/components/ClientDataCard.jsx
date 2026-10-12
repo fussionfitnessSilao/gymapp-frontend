@@ -16,10 +16,13 @@ import {
   profileToForm,
 } from '../clientForm';
 import { BirthDateFields, ContactFields, HealthFields, PreferenceFields, PrivacyLabel } from './ClientFields';
+import { useToast } from './Toast';
+import { reportFirstInvalid } from '../uiForm';
 
 /** Tarjeta de Perfil para ver y editar todos los datos del cliente (menos el correo). */
 export default function ClientDataCard() {
   const { user, setUser } = useAuth();
+  const showToast = useToast();
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(EMPTY_PROFILE_FORM);
   const [health, setHealth] = useState(EMPTY_HEALTH);
@@ -56,6 +59,7 @@ export default function ClientDataCard() {
 
   async function handleSubmit(event) {
     event.preventDefault();
+    if (reportFirstInvalid(event.currentTarget, showToast)) return;
     if (tooYoung) {
       setError(UNDER_AGE_MESSAGE);
       return;
@@ -109,7 +113,7 @@ export default function ClientDataCard() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit}>
+      <form noValidate onSubmit={handleSubmit}>
         <BirthDateFields form={form} setField={setField} required={false} idPrefix="mis-" />
         <ContactFields form={form} setField={setField} idPrefix="mis-" />
         <HealthFields health={health} setHealth={(value) => { setHealth(value); setMessage(null); }} />

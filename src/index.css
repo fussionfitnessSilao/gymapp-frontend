@@ -229,6 +229,7 @@ input:focus {
 }
 
 .btn {
+  text-decoration: none; /* los botones que son enlaces (ej. "Completar") no van subrayados */
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -326,6 +327,7 @@ input:focus {
 
 .session-card {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 1rem;
   padding: 1rem;
@@ -713,4 +715,165 @@ input[type='radio'] {
   background: var(--color-bg);
   color: var(--color-muted);
   border: 1px solid var(--color-border);
+}
+
+.session-error {
+  flex: 1 1 100%; /* el aviso de error ocupa todo el ancho, debajo del botón */
+  margin: 0;
+}
+
+/* ---- Formulario: campos con el título adentro, grupos, fecha, calzado y deportes ---- */
+
+.float-field {
+  position: relative;
+}
+
+.float-field input {
+  padding: 1.4rem 0.75rem 0.35rem;
+}
+
+.float-field label {
+  position: absolute;
+  left: 0.8rem;
+  top: 0.95rem;
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--color-muted);
+  pointer-events: none;
+  transition: top 0.12s ease, font-size 0.12s ease;
+}
+
+.float-field input:focus + label,
+.float-field input:not(:placeholder-shown) + label {
+  top: 0.4rem;
+  font-size: 0.7rem;
+}
+
+.field-group {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 0.75rem;
+  margin: 0 0 1rem;
+  display: grid;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.field-group legend {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-muted);
+  padding: 0 0.35rem;
+}
+
+.stack {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.date-row {
+  display: grid;
+  grid-template-columns: 1fr 1.7fr 1.2fr;
+  gap: 0.5rem;
+}
+
+.date-row select {
+  min-width: 0;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 0.2rem 0.3rem 0.2rem 0.7rem;
+  font-size: 0.85rem;
+}
+
+.chip-remove {
+  border: none;
+  background: transparent;
+  color: var(--color-muted);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.1rem 0.4rem;
+}
+
+.inline-add {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.link-button {
+  border: none;
+  background: transparent;
+  padding: 0;
+  color: var(--color-primary);
+  text-decoration: underline;
+  font-size: inherit;
+  cursor: pointer;
+}
+
+/* ---- Aviso breve (toast) y ventana superpuesta (aviso de privacidad) ---- */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 1.25rem;
+  transform: translateX(-50%);
+  max-width: calc(100% - 2rem);
+  background: var(--color-ink);
+  color: #fff;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  z-index: 1000;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 900;
+}
+
+.modal {
+  background: var(--color-surface);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 640px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-body {
+  overflow-y: auto;
+  padding: 1.25rem;
+}
+
+.modal-body.legal {
+  border: none;
+  background: transparent;
+}
+
+.modal-footer {
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--color-border);
 }

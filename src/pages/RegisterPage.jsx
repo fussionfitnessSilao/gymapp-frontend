@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { fetchMe, register } from '../api/auth';
 import { saveHealth, updateClientProfile } from '../api/clientProfile';
 import { BirthDateFields, ContactFields, HealthFields, PreferenceFields, PrivacyLabel } from '../components/ClientFields';
+import { useToast } from '../components/Toast';
 import {
   ACCOUNT_STEP_PROFILE_KEYS,
   ADULT_AGE,
@@ -16,6 +17,7 @@ import {
   pickPayload,
 } from '../clientForm';
 import { useAuth } from '../context/AuthContext';
+import { reportFirstInvalid } from '../uiForm';
 
 const EMPTY_ACCOUNT = { email: '', password: '', first_name: '', last_name: '', phone: '' };
 
@@ -28,6 +30,7 @@ const STEP_TITLES = {
 export default function RegisterPage() {
   const { login, setUser } = useAuth();
   const navigate = useNavigate();
+  const showToast = useToast();
   const [step, setStep] = useState(1);
   const [account, setAccount] = useState(EMPTY_ACCOUNT);
   const [form, setForm] = useState(EMPTY_PROFILE_FORM);
@@ -52,6 +55,7 @@ export default function RegisterPage() {
 
   async function handleStep1(event) {
     event.preventDefault();
+    if (reportFirstInvalid(event.currentTarget, showToast)) return;
     if (tooYoung) {
       setError(UNDER_AGE_MESSAGE);
       return;
@@ -81,6 +85,7 @@ export default function RegisterPage() {
 
   async function handleStep2(event) {
     event.preventDefault();
+    if (reportFirstInvalid(event.currentTarget, showToast)) return;
     setError(null);
     setSubmitting(true);
     try {
@@ -121,6 +126,7 @@ export default function RegisterPage() {
 
   function handleStep3(event) {
     event.preventDefault();
+    if (reportFirstInvalid(event.currentTarget, showToast)) return;
     complete(true);
   }
 
@@ -140,7 +146,7 @@ export default function RegisterPage() {
         {error && <div className="error-banner">{error}</div>}
 
         {step === 1 && (
-          <form onSubmit={handleStep1}>
+          <form noValidate onSubmit={handleStep1}>
             <div className="form-row">
               <div className="form-field">
                 <label htmlFor="first_name">Nombre</label>
@@ -181,7 +187,13 @@ export default function RegisterPage() {
             <BirthDateFields form={form} setField={setField} />
 
             <label className="choice" style={{ margin: '0.25rem 0 1rem' }}>
-              <input type="checkbox" required checked={acceptPrivacy} onChange={(event) => setAcceptPrivacy(event.target.checked)} />
+              <input
+                type="checkbox"
+                required
+                data-error="Acepta el aviso de privacidad para continuar."
+                checked={acceptPrivacy}
+                onChange={(event) => setAcceptPrivacy(event.target.checked)}
+              />
               <span>
                 <PrivacyLabel />
               </span>
@@ -194,7 +206,7 @@ export default function RegisterPage() {
         )}
 
         {step === 2 && (
-          <form onSubmit={handleStep2}>
+          <form noValidate onSubmit={handleStep2}>
             <ContactFields form={form} setField={setField} requireEmergency />
             <button type="submit" className="btn btn-primary btn-block" disabled={submitting}>
               {submitting ? 'Guardando…' : 'Continuar'}
@@ -203,7 +215,7 @@ export default function RegisterPage() {
         )}
 
         {step === 3 && (
-          <form onSubmit={handleStep3}>
+          <form noValidate onSubmit={handleStep3}>
             <HealthFields health={health} setHealth={setHealth} />
             <PreferenceFields form={form} setField={setField} />
 

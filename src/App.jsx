@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import CompleteProfileBanner from './components/CompleteProfileBanner';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
+import { ToastProvider } from './components/Toast';
 import { AuthProvider } from './context/AuthContext';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import InstallGuidePage from './pages/InstallGuidePage';
@@ -16,6 +17,7 @@ import SchedulePage from './pages/SchedulePage';
 export default function App() {
   return (
     <AuthProvider>
+      <ToastProvider>
       <div className="app-shell">
         <Navbar />
         <CompleteProfileBanner />
@@ -53,6 +55,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/schedule" replace />} />
         </Routes>
       </div>
+      </ToastProvider>
     </AuthProvider>
   );
 }
