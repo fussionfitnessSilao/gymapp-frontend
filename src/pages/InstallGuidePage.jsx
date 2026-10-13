@@ -12,11 +12,7 @@ function detectPlatform() {
 const STEPS = {
   ios: [
     {
-      text: 'Abre este sitio en Safari (no funciona igual en Chrome dentro de iPhone/iPad).',
-      image: '/capturas/ios-1.png',
-    },
-    {
-      text: 'Toca el ícono de compartir — el cuadrito con la flecha hacia arriba, abajo al centro de la pantalla.',
+      text: 'Desde safari o chrome, toca el ícono de compartir',
       image: '/capturas/ios-2.png',
     },
     {
@@ -24,15 +20,11 @@ const STEPS = {
       image: '/capturas/ios-3.png',
     },
     {
-      text: 'Toca "Agregar" arriba a la derecha. Listo — el ícono aparece en tu pantalla de inicio como una app.',
+      text: 'Toca "Agregar" arriba a la derecha. Listo, el ícono aparece en tu pantalla de inicio como una app.',
       image: '/capturas/ios-4.png',
     },
   ],
   android: [
-    {
-      text: 'Abre este sitio en Chrome.',
-      image: '/capturas/android-1.png',
-    },
     {
       text: 'Toca los tres puntos (⋮) arriba a la derecha, el menú de Chrome.',
       image: '/capturas/android-2.png',
@@ -42,7 +34,7 @@ const STEPS = {
       image: '/capturas/android-3.png',
     },
     {
-      text: 'Confirma tocando "Agregar" o "Instalar". Listo — el ícono aparece en tu pantalla de inicio.',
+      text: 'Confirma tocando "Agregar" o "Instalar". Listo, el ícono aparece en tu pantalla de inicio.',
       image: '/capturas/android-4.png',
     },
   ],
@@ -62,7 +54,7 @@ export default function InstallGuidePage() {
 
       <div className="card" style={{ maxWidth: 480 }}>
         <p className="subtitle" style={{ marginBottom: '1.25rem' }}>
-          Así puedes abrir la app directo desde tu celular, como cualquier otra — sin escribir la dirección cada vez.
+          Así puedes abrir la app directo desde tu celular y recibir notificaciones de tus sesiones
         </p>
 
         {platform !== 'other' && (
