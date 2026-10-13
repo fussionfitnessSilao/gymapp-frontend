@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { fetchMe, login as loginRequest, logout as logoutRequest } from '../api/auth';
 import { getTokens } from '../api/client';
+import { detachPushDevice } from '../push';
 
 const AuthContext = createContext(null);
 
@@ -26,6 +27,7 @@ export function AuthProvider({ children }) {
   }
 
   async function logout() {
+    await detachPushDevice(); // antes de cerrar sesión, mientras todavía hay token
     await logoutRequest();
     setUser(null);
   }

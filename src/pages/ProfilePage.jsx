@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { fetchCheckinToken, fetchMe, updateMe } from '../api/auth';
 import { fetchMyMembership } from '../api/membership';
 import ClientDataCard from '../components/ClientDataCard';
+import PushCard from '../components/PushCard';
 import { useAuth } from '../context/AuthContext';
 import { isInstalledApp } from '../pwa';
 
@@ -169,6 +170,8 @@ export default function ProfilePage() {
         </div>
 
         {user?.role === 'client' && <ClientDataCard />}
+
+        {user?.role === 'client' && <PushCard />}
 
         {!isInstalledApp() && (
           <div className="card" style={{ marginBottom: '1rem' }}>
