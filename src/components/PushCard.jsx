@@ -127,10 +127,7 @@ export default function PushCard() {
         </div>
       )}
       {message && (
-        <div
-          className="error-banner"
-          style={{ marginTop: '0.75rem', background: '#e8f0ec', color: 'var(--color-primary-dark)' }}
-        >
+        <div className="error-banner notice-ok" style={{ marginTop: '0.75rem' }}>
           {message}
         </div>
       )}

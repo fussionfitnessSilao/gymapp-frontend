@@ -5,6 +5,7 @@ import { fetchCheckinToken, fetchMe, updateMe } from '../api/auth';
 import { fetchMyMembership } from '../api/membership';
 import ClientDataCard from '../components/ClientDataCard';
 import PushCard from '../components/PushCard';
+import ThemeCard from '../components/ThemeCard';
 import { useAuth } from '../context/AuthContext';
 import { isInstalledApp } from '../pwa';
 
@@ -172,6 +173,8 @@ export default function ProfilePage() {
         {user?.role === 'client' && <ClientDataCard />}
 
         {user?.role === 'client' && <PushCard />}
+
+        <ThemeCard />
 
         {!isInstalledApp() && (
           <div className="card" style={{ marginBottom: '1rem' }}>

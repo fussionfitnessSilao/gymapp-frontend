@@ -5,6 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fussion Fitness</title>
 
+    <!-- Apariencia: se aplica antes de pintar para que no parpadee (la lógica completa está en src/theme.js) -->
+    <script>
+      (function () {
+        try {
+          var pref = localStorage.getItem('fussion-theme');
+          var dark =
+            pref === 'dark' ||
+            (pref !== 'light' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        } catch (e) {}
+      })();
+    </script>
+
     <!-- Favicon (pestaña del navegador) -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
