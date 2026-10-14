@@ -1,0 +1,23 @@
+/* Campos obligatorios que faltan (los marca uiForm.js): borde y etiqueta en rojo hasta que se llenan.
+   Usa el rojo de la app (--color-danger), que ya cambia en el modo oscuro. */
+input.field-invalid,
+select.field-invalid,
+textarea.field-invalid {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 1px var(--color-danger);
+}
+
+.form-field.has-error > label,
+.form-field.has-error > .field-label {
+  color: var(--color-danger);
+}
+
+.choice.has-error {
+  color: var(--color-danger);
+}
+
+.choice.has-error input[type='checkbox'],
+.choice.has-error input[type='radio'] {
+  outline: 2px solid var(--color-danger);
+  outline-offset: 1px;
+}
