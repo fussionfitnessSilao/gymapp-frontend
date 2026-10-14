@@ -5,6 +5,7 @@ import App from './App';
 import './index.css';
 import './forms.css';
 import './theme.css';
+import './pwa'; // escucha temprano el aviso de instalación de Chrome (ver pwa.js)
 import { initTheme } from './theme';
 
 initTheme();

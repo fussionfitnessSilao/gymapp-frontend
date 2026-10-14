@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import CompleteProfileBanner from './components/CompleteProfileBanner';
+import InstallBanner from './components/InstallBanner';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
 import { ToastProvider } from './components/Toast';
@@ -21,6 +22,7 @@ export default function App() {
       <div className="app-shell">
         <Navbar />
         <CompleteProfileBanner />
+        <InstallBanner />
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
