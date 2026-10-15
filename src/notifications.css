@@ -1,0 +1,77 @@
+/* Centro de notificaciones y su campana en la barra. Solo usa las variables de color de la app (sirve en claro y oscuro). */
+.navbar-bell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-left: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.navbar-bell svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.navbar-bell-count {
+  min-width: 1.15rem;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.15rem;
+  text-align: center;
+}
+
+:root[data-theme='dark'] .navbar-bell-count {
+  color: #000;
+}
+
+.notification-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.notification {
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--color-border);
+  border-left-width: 4px;
+  border-radius: 12px;
+  background: var(--color-surface);
+}
+
+.notification.unread {
+  border-left-color: var(--color-primary);
+}
+
+.notification.read {
+  opacity: 0.7;
+}
+
+.notification-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.3rem;
+}
+
+.notification-time {
+  flex-shrink: 0;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+}
+
+.notification-message {
+  margin: 0 0 0.4rem;
+  white-space: pre-line;
+}

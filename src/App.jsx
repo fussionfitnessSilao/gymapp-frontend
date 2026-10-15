@@ -10,6 +10,7 @@ import InstallGuidePage from './pages/InstallGuidePage';
 import LoginPage from './pages/LoginPage';
 import MyReservationsPage from './pages/MyReservationsPage';
 import PrivacyPage from './pages/PrivacyPage';
+import NotificationsPage from './pages/NotificationsPage';
 import ProfilePage from './pages/ProfilePage';
 import RegisterPage from './pages/RegisterPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
@@ -43,6 +44,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <MyReservationsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/notificaciones"
+            element={
+              <ProtectedRoute>
+                <NotificationsPage />
               </ProtectedRoute>
             }
           />
