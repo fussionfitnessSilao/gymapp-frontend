@@ -70,8 +70,10 @@
 }
 
 :root[data-theme='dark'] .notice-ok,
-/* Avisos de éxito que traen el verde claro escrito en el propio componente */
-:root[data-theme='dark'] [style*='#e8f0ec'] {
+/* Avisos de éxito que traen el verde claro escrito en el propio componente. El navegador guarda ese color como
+   rgb(232, 240, 236) en el atributo style, por eso se buscan las dos formas. */
+:root[data-theme='dark'] [style*='#e8f0ec'],
+:root[data-theme='dark'] [style*='rgb(232, 240, 236)'] {
   background: var(--color-ok-bg) !important;
   color: var(--color-primary-dark) !important;
 }

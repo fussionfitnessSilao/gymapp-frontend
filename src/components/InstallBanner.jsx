@@ -31,7 +31,7 @@ export default function InstallBanner() {
         </button>
       ) : (
         <Link className="btn btn-primary btn-small" to="/instalar">
-          Cómo
+          Instalar
         </Link>
       )}
     </div>

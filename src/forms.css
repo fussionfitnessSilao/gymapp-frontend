@@ -21,3 +21,10 @@ textarea.field-invalid {
   outline: 2px solid var(--color-danger);
   outline-offset: 1px;
 }
+
+/* Avisos fijos (completar datos, instalar la app): botones del mismo ancho para que apilados se vean parejos. */
+.complete-banner .btn {
+  min-width: 8.5rem;
+  text-align: center;
+  justify-content: center;
+}

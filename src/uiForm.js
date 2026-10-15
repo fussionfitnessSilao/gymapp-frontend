@@ -76,3 +76,8 @@ export function reportFirstInvalid(form, showToast) {
   showToast(`${labelText(first)}${extra}`);
   return true;
 }
+
+/** Resalta en rojo todos los campos pendientes sin avisar ni mover el cursor (muestra de entrada lo que falta). */
+export function highlightInvalid(form) {
+  form.querySelectorAll('input:invalid, select:invalid, textarea:invalid').forEach(mark);
+}

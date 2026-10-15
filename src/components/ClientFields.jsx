@@ -318,8 +318,8 @@ export function ContactFields({ form, setField, requireEmergency = false, idPref
   );
 }
 
-/** Pregunta de salud: sí/no y, si es sí, el detalle. */
-export function HealthFields({ health, setHealth }) {
+/** Pregunta de salud: sí/no y, si es sí, el detalle. `required`: se exige elegir una respuesta. */
+export function HealthFields({ health, setHealth, required = false }) {
   return (
     <fieldset className="form-field choice-fieldset">
       <legend>¿Tienes alguna lesión, cirugía o enfermedad que debamos conocer?</legend>
@@ -328,6 +328,7 @@ export function HealthFields({ health, setHealth }) {
           <input
             type="radio"
             name="has_condition"
+            required={required}
             checked={health.has_condition === false}
             onChange={() => setHealth({ has_condition: false, details: '' })}
           />
@@ -337,6 +338,7 @@ export function HealthFields({ health, setHealth }) {
           <input
             type="radio"
             name="has_condition"
+            required={required}
             checked={health.has_condition === true}
             onChange={() => setHealth((prev) => ({ ...prev, has_condition: true }))}
           />

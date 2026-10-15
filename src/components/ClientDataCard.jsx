@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { fetchMe } from '../api/auth';
 import { fetchClientProfile, fetchHealth, saveHealth, updateClientProfile } from '../api/clientProfile';
 import { useAuth } from '../context/AuthContext';
@@ -17,7 +17,7 @@ import {
 } from '../clientForm';
 import { BirthDateFields, ContactFields, HealthFields, PreferenceFields, PrivacyLabel } from './ClientFields';
 import { useToast } from './Toast';
-import { reportFirstInvalid } from '../uiForm';
+import { highlightInvalid, reportFirstInvalid } from '../uiForm';
 
 /** Tarjeta de Perfil para ver y editar todos los datos del cliente (menos el correo). */
 export default function ClientDataCard() {
@@ -31,6 +31,9 @@ export default function ClientDataCard() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
+  const formRef = useRef(null);
+  // Mientras falten los datos que pide el aviso de completar (nacimiento, contacto de emergencia, salud), son obligatorios.
+  const incomplete = user?.profile_complete === false;
 
   useEffect(() => {
     async function load() {
@@ -47,6 +50,13 @@ export default function ClientDataCard() {
     }
     load();
   }, []);
+
+  // Al llegar desde el aviso, ya se ve en rojo lo que falta.
+  useEffect(() => {
+    if (loading || !incomplete) return undefined;
+    const timer = setTimeout(() => formRef.current && highlightInvalid(formRef.current), 0);
+    return () => clearTimeout(timer);
+  }, [loading, incomplete]);
 
   const age = ageFromDate(form.birth_date);
   const tooYoung = age !== null && age < MIN_AGE;
@@ -108,15 +118,20 @@ export default function ClientDataCard() {
 
       {error && <div className="error-banner">{error}</div>}
       {message && (
-        <div className="error-banner" style={{ background: '#e8f0ec', color: 'var(--color-primary-dark)' }}>
-          {message}
-        </div>
+        <div className="error-banner notice-ok">{message}</div>
       )}
 
-      <form noValidate onSubmit={handleSubmit}>
-        <BirthDateFields form={form} setField={setField} required={false} idPrefix="mis-" />
-        <ContactFields form={form} setField={setField} idPrefix="mis-" />
-        <HealthFields health={health} setHealth={(value) => { setHealth(value); setMessage(null); }} />
+      <form noValidate onSubmit={handleSubmit} ref={formRef}>
+        <BirthDateFields form={form} setField={setField} required={incomplete} idPrefix="mis-" />
+        <ContactFields form={form} setField={setField} requireEmergency={incomplete} idPrefix="mis-" />
+        <HealthFields
+          health={health}
+          required={incomplete}
+          setHealth={(value) => {
+            setHealth(value);
+            setMessage(null);
+          }}
+        />
         <PreferenceFields form={form} setField={setField} idPrefix="mis-" />
 
         {!privacyAccepted && (

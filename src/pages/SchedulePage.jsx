@@ -14,7 +14,7 @@ import {
 const ERROR_MESSAGES = {
   MEMBERSHIP_EXPIRED: 'No tienes una membresía vigente. Habla con recepción.',
   NO_CLASSES_REMAINING: 'No te quedan clases en tu paquete actual.',
-  SESSION_FULL: 'Esta clase ya no tiene cupo.',
+  SESSION_FULL: 'Esta clase se acaba de llenar. Ya puedes anotarte en la lista de espera.',
   ALREADY_RESERVED: 'Ya tienes una reservación para esta clase.',
   FIXED_SCHEDULE_ONLY: 'Esta clase no forma parte de tu horario fijo.',
 };
@@ -51,9 +51,12 @@ export default function SchedulePage() {
   const [makeupRefresh, setMakeupRefresh] = useState(0);
   const now = useNow();
 
-  async function loadSessions() {
-    setLoading(true);
-    setLoadError(null);
+  // `silent`: actualiza en segundo plano, sin la pantalla "Cargando…" ni borrar lo que ya se ve.
+  async function loadSessions({ silent = false } = {}) {
+    if (!silent) {
+      setLoading(true);
+      setLoadError(null);
+    }
     try {
       const today = new Date();
       const twoWeeksOut = new Date(today);
@@ -64,14 +67,28 @@ export default function SchedulePage() {
       });
       setSessions(data.results || []);
     } catch (err) {
-      setLoadError(err.message || 'No pudimos cargar el horario.');
+      if (!silent) setLoadError(err.message || 'No pudimos cargar el horario.');
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   }
 
   useEffect(() => {
     loadSessions();
+  }, []);
+
+  // Otras personas reservan mientras esta pantalla está abierta: se actualiza sola cada minuto y al volver a la app
+  // (por ejemplo, al sacarla del fondo del celular), para no mostrar lugares que ya se ocuparon.
+  useEffect(() => {
+    const refresh = () => {
+      if (document.visibilityState === 'visible') loadSessions({ silent: true });
+    };
+    const timer = setInterval(refresh, 60000);
+    document.addEventListener('visibilitychange', refresh);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', refresh);
+    };
   }, []);
 
   async function handleReserve(sessionId) {
@@ -86,6 +103,7 @@ export default function SchedulePage() {
         ...prev,
         [sessionId]: ERROR_MESSAGES[err.code] || err.message || 'No pudimos completar tu reservación.',
       }));
+      loadSessions({ silent: true }); // lo que se veía ya cambió (p. ej. se llenó): la tarjeta se actualiza sola
     } finally {
       setReservingId(null);
     }
@@ -102,6 +120,7 @@ export default function SchedulePage() {
         ...prev,
         [sessionId]: ERROR_MESSAGES[err.code] || err.message || 'No pudimos actualizar la lista de espera.',
       }));
+      loadSessions({ silent: true });
     } finally {
       setWaitlistBusyId(null);
     }
