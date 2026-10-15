@@ -9,7 +9,10 @@ export default function Navbar() {
 
   return (
     <nav className="navbar">
-      <span className="navbar-brand">{user.gym_name || 'Estudio'}</span>
+      <div className="navbar-start">
+        <span className="navbar-brand">{user.gym_name || 'Estudio'}</span>
+        <NotificationBell />
+      </div>
       <div className="navbar-links">
         <NavLink to="/schedule" className={({ isActive }) => `navbar-link${isActive ? ' active' : ''}`}>
           Horario
@@ -21,7 +24,6 @@ export default function Navbar() {
           Perfil
         </NavLink>
       </div>
-      <NotificationBell />
     </nav>
   );
 }
