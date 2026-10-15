@@ -11,34 +11,57 @@
   position: relative;
   display: inline-flex;
   align-items: center;
-  padding: 0.25rem;
+  padding: 0.1rem;
   color: var(--color-ink);
   text-decoration: none;
 }
 
 .navbar-bell svg {
-  width: 1.4rem;
-  height: 1.4rem;
+  width: 1.05rem;
+  height: 1.05rem;
 }
 
 /* El número va encimado en la esquina del ícono. */
 .navbar-bell-count {
   position: absolute;
-  top: -0.2rem;
-  right: -0.35rem;
-  min-width: 1.05rem;
-  padding: 0 0.28rem;
+  top: -0.35rem;
+  right: -0.45rem;
+  min-width: 0.95rem;
+  padding: 0 0.25rem;
   border-radius: 999px;
   background: var(--color-primary);
   color: #fff;
-  font-size: 0.68rem;
+  font-size: 0.62rem;
   font-weight: 700;
-  line-height: 1.05rem;
+  line-height: 0.95rem;
   text-align: center;
 }
 
 :root[data-theme='dark'] .navbar-bell-count {
   color: #000;
+}
+
+/* En celular, con la campana a la vista la barra se compacta un poco para que "Horario", "Mis reservaciones" y
+   "Perfil" sigan en la misma línea; si aun así no cupiera, el nombre del estudio se recorta con "…" en lugar de
+   mandar los enlaces a otro renglón. */
+@media (max-width: 640px) {
+  .navbar:has(.navbar-bell) .navbar-start {
+    flex: 1 1 0;
+    min-width: 0;
+    gap: 0.45rem;
+  }
+
+  .navbar:has(.navbar-bell) .navbar-brand {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.98rem;
+  }
+
+  .navbar:has(.navbar-bell) .navbar-links {
+    gap: 0.7rem;
+  }
 }
 
 .notification-list {
