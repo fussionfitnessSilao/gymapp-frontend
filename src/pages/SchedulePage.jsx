@@ -3,6 +3,7 @@ import CapacityDots from '../components/CapacityDots';
 import MakeupBanner from '../components/MakeupBanner';
 import { createReservation } from '../api/reservations';
 import { fetchSessions } from '../api/sessions';
+import { useAuth } from '../context/AuthContext';
 import { joinWaitlist, leaveWaitlist } from '../api/waitlist';
 import {
   GENERAL_CANCELLATION_HOURS,
@@ -42,6 +43,9 @@ function groupByDay(sessions) {
 }
 
 export default function SchedulePage() {
+  const { user } = useAuth();
+  // Admin y Recepción ven el horario igual que un cliente, pero solo para mirar: sin reservar ni lista de espera.
+  const readOnly = user?.role !== 'client';
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
@@ -133,10 +137,10 @@ export default function SchedulePage() {
   return (
     <div className="page">
       <div className="page-header">
-        <p>Las próximas clases.</p>
+        <p>{readOnly ? 'Las próximas clases (solo lectura).' : 'Las próximas clases.'}</p>
       </div>
 
-      <MakeupBanner refreshKey={makeupRefresh} />
+      {!readOnly && <MakeupBanner refreshKey={makeupRefresh} />}
 
       {loadError && <div className="error-banner">{loadError}</div>}
 
@@ -160,27 +164,44 @@ export default function SchedulePage() {
                   <CapacityDots capacity={session.capacity} spotsAvailable={session.spots_available} />
                   {session.is_special_event && <span className="badge badge-accent">Evento especial</span>}
                 </div>
-                <SessionNotices session={session} now={now} />
-                {session.my_waitlist_position != null && (
+                {!readOnly && <SessionNotices session={session} now={now} />}
+                {!readOnly && session.my_waitlist_position != null && (
                   <div style={{ marginTop: '0.4rem', fontSize: '0.85rem', color: 'var(--color-muted)' }}>
                     En lista de espera. Si alguien cancela con tiempo, tu lugar se reserva solo y te avisamos.
                   </div>
                 )}
               </div>
               <div className="session-actions">
-                <ReserveButton
-                  session={session}
-                  reserving={reservingId === session.id}
-                  onReserve={() => handleReserve(session.id)}
-                  waitlistBusy={waitlistBusyId === session.id}
-                  onJoinWaitlist={() => handleWaitlist(session.id, 'join')}
-                />
+                {readOnly ? (
+                  <Occupancy session={session} />
+                ) : (
+                  <ReserveButton
+                    session={session}
+                    reserving={reservingId === session.id}
+                    onReserve={() => handleReserve(session.id)}
+                    waitlistBusy={waitlistBusyId === session.id}
+                    onJoinWaitlist={() => handleWaitlist(session.id, 'join')}
+                  />
+                )}
               </div>
               {actionErrors[session.id] && <div className="error-banner session-error">{actionErrors[session.id]}</div>}
             </div>
           ))}
         </div>
       ))}
+    </div>
+  );
+}
+
+// Vista de solo lectura (Admin/Recepción): cuántos lugares están ocupados y, si la hay, cuánta gente espera.
+function Occupancy({ session }) {
+  const taken = Math.max(0, session.capacity - session.spots_available);
+  return (
+    <div style={{ textAlign: 'right', fontSize: '0.85rem', color: 'var(--color-muted)' }}>
+      <div>
+        <strong>{taken}</strong> de {session.capacity}
+      </div>
+      {session.waitlist_count > 0 && <div>{session.waitlist_count} en espera</div>}
     </div>
   );
 }
