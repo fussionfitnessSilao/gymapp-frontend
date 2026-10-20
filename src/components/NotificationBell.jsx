@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { fetchNotifications } from '../api/notifications';
+import { clearAppBadge, setAppBadge } from '../badge';
 import { useAuth } from '../context/AuthContext';
 import '../notifications.css';
 
@@ -9,25 +10,32 @@ export const NOTIFICATIONS_CHANGED = 'notifications-changed';
 
 /**
  * Campana de la barra: aparece SOLO cuando hay avisos por leer (con cuántos) y lleva al centro de notificaciones.
- * Se actualiza al cambiar de pantalla, al volver a la app y cada minuto.
+ * Se actualiza al cambiar de pantalla, al volver a la app y cada minuto. Con la app instalada, el mismo número
+ * se pone en el ícono. Es para clientes y para Admin (que recibe avisos del sistema y de nuevos registros).
  */
 export default function NotificationBell() {
   const { user } = useAuth();
   const { pathname } = useLocation();
   const [unread, setUnread] = useState(0);
-  const isClient = user?.role === 'client';
+  const enabled = user?.role === 'client' || user?.role === 'admin';
 
   const refresh = useCallback(async () => {
     try {
       const data = await fetchNotifications();
-      setUnread(data.unread_count || 0);
+      const count = data.unread_count || 0;
+      setUnread(count);
+      setAppBadge(count);
     } catch {
       // Sin red o sesión vencida: se deja lo que había; no es motivo para avisar.
     }
   }, []);
 
   useEffect(() => {
-    if (!isClient) return undefined;
+    if (!enabled) {
+      setUnread(0);
+      clearAppBadge(); // sesión cerrada (o rol sin avisos): el ícono no debe quedarse con el número anterior
+      return undefined;
+    }
     refresh();
     const onVisible = () => document.visibilityState === 'visible' && refresh();
     const timer = setInterval(onVisible, 60000);
@@ -38,9 +46,9 @@ export default function NotificationBell() {
       document.removeEventListener('visibilitychange', onVisible);
       window.removeEventListener(NOTIFICATIONS_CHANGED, refresh);
     };
-  }, [isClient, refresh, pathname]);
+  }, [enabled, refresh, pathname]);
 
-  if (!isClient || unread === 0) return null;
+  if (!enabled || unread === 0) return null;
 
   return (
     <NavLink to="/notificaciones" className="navbar-bell" aria-label={`${unread} notificaciones por leer`}>

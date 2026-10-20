@@ -9,7 +9,7 @@ function errorText(err) {
   return typeof err?.code === 'string' && err.message ? err.message : GENERIC_ERROR;
 }
 
-export default function PushCard() {
+export default function PushCard({ isAdmin = false }) {
   const [state, setState] = useState(null);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState(null);
@@ -100,7 +100,11 @@ export default function PushCard() {
 
       {state === 'off' && (
         <>
-          <p style={mutedText}>Te avisamos de tus reservaciones, recordatorios y cambios en tus clases.</p>
+          <p style={mutedText}>
+            {isAdmin
+              ? 'Te avisamos de nuevos registros en la app y de problemas del sistema.'
+              : 'Te avisamos de tus reservaciones, recordatorios y cambios en tus clases.'}
+          </p>
           <button type="button" className="btn btn-primary btn-small" onClick={handleEnable} disabled={busy}>
             {busy ? 'Activando…' : 'Activar notificaciones'}
           </button>

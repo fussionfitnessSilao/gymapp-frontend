@@ -172,7 +172,7 @@ export default function ProfilePage() {
 
         {user?.role === 'client' && <ClientDataCard />}
 
-        {user?.role === 'client' && <PushCard />}
+        {(user?.role === 'client' || user?.role === 'admin') && <PushCard isAdmin={user?.role === 'admin'} />}
 
         <ThemeCard />
 

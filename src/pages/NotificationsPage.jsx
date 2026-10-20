@@ -11,6 +11,9 @@ const KINDS = {
   waitlist_promoted: { title: 'Lugar disponible', to: '/reservations', action: 'Ver mis reservaciones' },
   session_cancelled: { title: 'Clase cancelada', to: '/schedule', action: 'Ver el horario' },
   membership_expiring: { title: 'Tu membresía', to: '/profile', action: 'Ver mi perfil' },
+  // Avisos para Admin: no llevan a otra pantalla de la app (el detalle está en el panel de administración).
+  admin_system_alert: { title: 'Alerta del sistema' },
+  admin_new_client: { title: 'Nuevo registro' },
 };
 
 function formatWhen(iso) {
@@ -84,7 +87,7 @@ export default function NotificationsPage() {
                   </time>
                 </div>
                 <p className="notification-message">{item.message}</p>
-                {kind && (
+                {kind?.to && (
                   <Link className="btn btn-ghost btn-small" to={kind.to}>
                     {kind.action}
                   </Link>

@@ -13,14 +13,29 @@ self.addEventListener('push', (event) => {
 
   // Cada push debe mostrar una notificación (iPhone retira el permiso si no se muestra).
   event.waitUntil(
-    self.registration.showNotification(data.title || 'Fussion Fitness', {
-      body: data.body || '',
-      icon: '/icon-192.png',
-      tag: data.tag || undefined,
-      data: { url: data.url || '/reservations' },
-    })
+    Promise.all([
+      self.registration.showNotification(data.title || 'Fussion Fitness', {
+        body: data.body || '',
+        icon: '/icon-192.png',
+        tag: data.tag || undefined,
+        data: { url: data.url || '/reservations' },
+      }),
+      updateBadge(data.badge),
+    ])
   );
 });
+
+// Número en el ícono de la app: el servidor manda cuántos avisos sin leer tiene la persona. Si el navegador no
+// soporta la Badging API (o el push no trae el dato), se deja como estaba.
+async function updateBadge(count) {
+  if (typeof count !== 'number' || !self.navigator || !('setAppBadge' in self.navigator)) return;
+  try {
+    if (count > 0) await self.navigator.setAppBadge(count);
+    else await self.navigator.clearAppBadge();
+  } catch {
+    // Sin permiso o sin soporte: no es motivo para fallar el aviso.
+  }
+}
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
