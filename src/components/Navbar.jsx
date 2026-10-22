@@ -40,7 +40,7 @@ export default function Navbar() {
         {user.role !== 'client' && (
           // Personal del estudio: abre el panel de administración (inicia sesión allí la primera vez).
           <a className="navbar-link" href={ADMIN_URL} target="_blank" rel="noopener noreferrer">
-            Administración
+            Admin
           </a>
         )}
       </div>

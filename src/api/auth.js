@@ -17,6 +17,8 @@ export async function logout() {
     if (refresh) {
       await request('/auth/logout/', { method: 'POST', body: { refresh } });
     }
+  } catch {
+    // Sesión ya vencida o sin conexión: igual se cierra la sesión en este dispositivo.
   } finally {
     clearTokens();
   }

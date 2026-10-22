@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, sessionExpired } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,6 +30,7 @@ export default function LoginPage() {
         <h1>Te damos la bienvenida</h1>
         <p className="subtitle">Inicia sesión para reservar tu próxima clase.</p>
 
+        {sessionExpired && !error && <div className="error-banner">Tu sesión expiró. Inicia sesión de nuevo.</div>}
         {error && <div className="error-banner">{error}</div>}
 
         <form onSubmit={handleSubmit}>

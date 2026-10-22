@@ -1,5 +1,8 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
 
+// Aviso global de que la sesión ya no se puede renovar: AuthContext lo escucha y manda a la persona al login.
+export const SESSION_EXPIRED_EVENT = 'gymapp:session-expired';
+
 export function getTokens() {
   return {
     access: localStorage.getItem('access_token'),
@@ -61,6 +64,7 @@ export async function request(path, { method = 'GET', body, auth = true, retry =
       return request(path, { method, body, auth, retry: false });
     } catch {
       clearTokens();
+      window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
       throw { code: 'SESSION_EXPIRED', message: 'Tu sesión expiró. Inicia sesión de nuevo.' };
     }
   }
