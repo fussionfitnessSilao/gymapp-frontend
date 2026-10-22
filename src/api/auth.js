@@ -1,3 +1,4 @@
+import { isInstalledApp } from '../pwa';
 import { clearTokens, request, setTokens } from './client';
 
 export async function login(email, password) {
@@ -22,7 +23,9 @@ export async function logout() {
 }
 
 export function fetchMe() {
-  return request('/me/');
+  // Si la app está abierta desde el ícono de la pantalla de inicio, se avisa al servidor (reporte de adopción).
+  // Va en la dirección y no en un encabezado para no tocar la configuración de CORS.
+  return request(isInstalledApp() ? '/me/?app=installed' : '/me/');
 }
 
 export function fetchCheckinToken() {
