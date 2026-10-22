@@ -1,10 +1,12 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { ADMIN_URL } from '../adminLink';
 import { useAuth } from '../context/AuthContext';
 import NotificationBell from './NotificationBell';
+import '../help.css';
 
 export default function Navbar() {
   const { user } = useAuth();
+  const { pathname } = useLocation();
 
   if (!user) return null;
 
@@ -13,6 +15,15 @@ export default function Navbar() {
       <div className="navbar-start">
         <span className="navbar-brand">{user.gym_name || 'Estudio'}</span>
         <NotificationBell />
+        <NavLink
+          to="/ayuda"
+          state={{ from: pathname }}
+          className={({ isActive }) => `navbar-help${isActive ? ' active' : ''}`}
+          aria-label="Ayuda"
+          title="Ayuda"
+        >
+          ?
+        </NavLink>
       </div>
       <div className="navbar-links">
         <NavLink to="/schedule" className={({ isActive }) => `navbar-link${isActive ? ' active' : ''}`}>

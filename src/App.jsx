@@ -6,11 +6,13 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { ToastProvider } from './components/Toast';
 import { AuthProvider } from './context/AuthContext';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import HelpPage from './pages/HelpPage';
 import InstallGuidePage from './pages/InstallGuidePage';
 import LoginPage from './pages/LoginPage';
 import MyReservationsPage from './pages/MyReservationsPage';
 import PrivacyPage from './pages/PrivacyPage';
 import NotificationsPage from './pages/NotificationsPage';
+import PackagesPage from './pages/PackagesPage';
 import ProfilePage from './pages/ProfilePage';
 import RegisterPage from './pages/RegisterPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
@@ -31,6 +33,8 @@ export default function App() {
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/instalar" element={<InstallGuidePage />} />
           <Route path="/privacidad" element={<PrivacyPage />} />
+          <Route path="/ayuda" element={<HelpPage />} />
+          <Route path="/paquetes" element={<PackagesPage />} />
           <Route
             path="/schedule"
             element={

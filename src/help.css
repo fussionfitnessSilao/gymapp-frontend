@@ -1,0 +1,108 @@
+/* Ayuda, reportar error y paquetes. */
+
+.navbar-help {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  border: 1.5px solid var(--color-muted);
+  border-radius: 50%;
+  color: var(--color-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  flex: none;
+}
+
+.navbar-help:hover,
+.navbar-help.active {
+  color: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+}
+
+.help-stack {
+  display: grid;
+  gap: 1rem;
+}
+
+.help-card h2 {
+  font-size: 1.05rem;
+  margin-bottom: 0.4rem;
+}
+
+.help-card p {
+  color: var(--color-muted);
+  font-size: 0.92rem;
+  margin-bottom: 0.9rem;
+}
+
+.help-card p:last-child {
+  margin-bottom: 0;
+}
+
+.help-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.faq details {
+  border-top: 1px solid var(--color-border);
+  padding: 0.7rem 0;
+}
+
+.faq details:first-of-type {
+  border-top: none;
+}
+
+.faq summary {
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.faq details p {
+  margin: 0.5rem 0 0;
+}
+
+.package-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.package-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.package-info {
+  min-width: 0;
+}
+
+.package-name {
+  font-weight: 600;
+}
+
+.package-detail {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  margin-top: 0.15rem;
+}
+
+.package-price {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-primary-dark);
+  margin-top: 0.3rem;
+}
+
+@media (max-width: 640px) {
+  .package-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

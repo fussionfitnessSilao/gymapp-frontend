@@ -134,6 +134,9 @@ export default function ProfilePage() {
           ) : (
             <p style={{ color: 'var(--color-muted)' }}>{membershipMessage}</p>
           )}
+          <Link to="/paquetes" className="btn btn-ghost btn-block" style={{ marginTop: '1rem' }}>
+            Ver paquetes
+          </Link>
         </div>
 
         <div className="card">
