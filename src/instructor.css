@@ -1,0 +1,4 @@
+/* Horario del Instructor: sus clases se distinguen de las demás. */
+.session-card-mine {
+  border-left: 4px solid var(--color-primary);
+}

@@ -11,6 +11,7 @@ import {
   describeCancellation,
   useNow,
 } from '../cancellation';
+import '../instructor.css';
 
 const ERROR_MESSAGES = {
   MEMBERSHIP_EXPIRED: 'No tienes una membresía vigente. Habla con recepción.',
@@ -46,6 +47,8 @@ export default function SchedulePage() {
   const { user } = useAuth();
   // Admin y Recepción ven el horario igual que un cliente, pero solo para mirar: sin reservar ni lista de espera.
   const readOnly = user?.role !== 'client';
+  // El Instructor ve todo el horario, pero sin ocupación: solo cuántas personas reservaron en SUS clases.
+  const isInstructor = user?.role === 'instructor';
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
@@ -137,7 +140,13 @@ export default function SchedulePage() {
   return (
     <div className="page">
       <div className="page-header">
-        <p>{readOnly ? 'Las próximas clases (solo lectura).' : 'Las próximas clases.'}</p>
+        <p>
+          {isInstructor
+            ? 'Las próximas clases del estudio (solo lectura). En las tuyas ves cuántas personas han reservado.'
+            : readOnly
+              ? 'Las próximas clases (solo lectura).'
+              : 'Las próximas clases.'}
+        </p>
       </div>
 
       {!readOnly && <MakeupBanner refreshKey={makeupRefresh} />}
@@ -155,13 +164,13 @@ export default function SchedulePage() {
         <div className="schedule-day" key={day}>
           <div className="schedule-day-label">{formatDayLabel(day)}</div>
           {daySessions.map((session) => (
-            <div className="card session-card" key={session.id}>
+            <div className={`card session-card${isInstructor && session.is_mine ? ' session-card-mine' : ''}`} key={session.id}>
               <div className="session-time">{formatTime(session.start_datetime)}</div>
               <div className="session-info">
                 <h3>{session.name}</h3>
                 <div className="session-meta">
                   <span>{session.instructor_name}</span>
-                  <CapacityDots capacity={session.capacity} spotsAvailable={session.spots_available} />
+                  {!isInstructor && <CapacityDots capacity={session.capacity} spotsAvailable={session.spots_available} />}
                   {session.is_special_event && <span className="badge badge-accent">Evento especial</span>}
                 </div>
                 {!readOnly && <SessionNotices session={session} now={now} />}
@@ -172,7 +181,9 @@ export default function SchedulePage() {
                 )}
               </div>
               <div className="session-actions">
-                {readOnly ? (
+                {isInstructor ? (
+                  <InstructorCount session={session} />
+                ) : readOnly ? (
                   <Occupancy session={session} />
                 ) : (
                   <ReserveButton
@@ -189,6 +200,16 @@ export default function SchedulePage() {
           ))}
         </div>
       ))}
+    </div>
+  );
+}
+
+// Vista del Instructor: solo en sus clases, cuántas personas tienen reservación; en las demás no se muestra nada.
+function InstructorCount({ session }) {
+  if (!session.is_mine || session.reserved_count == null) return null;
+  return (
+    <div style={{ textAlign: 'right', fontSize: '0.85rem', color: 'var(--color-muted)' }}>
+      <strong>{session.reserved_count}</strong> {session.reserved_count === 1 ? 'reservado' : 'reservados'}
     </div>
   );
 }
