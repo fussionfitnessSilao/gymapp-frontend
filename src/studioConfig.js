@@ -12,4 +12,4 @@ export const STUDIO_WEBSITE_URL = 'https://fussion-fitness-studio.vercel.app/';
 // "Quiero contratar el paquete <name>". Un paquete por renglón:
 //   { name: 'Paquete 10 clases', detail: 'Vigencia de 30 días', price: '$1,200' },
 // `detail` y `price` son opcionales (son texto libre: pon el precio como quieras que se vea).
-export const PACKAGES = [{ name: 'Paquete 1 clase', detail: 'Vigencia de 1 día', price: '$100' },{ name: 'Paquete Star', detail: '16 clases al mes de lunes a jueves en horario fijo, una clase al dia, spinning y tonificación, vigecia 28 días', price: '$620' },{ name: 'Paquete Flex', detail: '20 clases al mes, una clase por día, spinning y tonificación, vigencia de 28 días naturales', price: '$750' }];
+export const PACKAGES = [];

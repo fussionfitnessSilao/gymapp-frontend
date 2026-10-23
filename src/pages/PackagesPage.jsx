@@ -1,35 +1,80 @@
+import { useEffect, useState } from 'react';
+import { fetchPackages } from '../api/packages';
 import { useAuth } from '../context/AuthContext';
-import { PACKAGES, STUDIO_WEBSITE_URL } from '../studioConfig';
+import { STUDIO_WEBSITE_URL } from '../studioConfig';
 import { packageMessage, packagesInquiryMessage, whatsappConfigured, whatsappUrl } from '../whatsapp';
 import '../help.css';
 
+const priceFormat = new Intl.NumberFormat('es-MX', {
+  style: 'currency',
+  currency: 'MXN',
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 2,
+});
+
+function formatPrice(price) {
+  if (price === null || price === undefined || price === '') return null;
+  const amount = Number(price);
+  return Number.isFinite(amount) ? priceFormat.format(amount) : null;
+}
+
 export default function PackagesPage() {
   const { user } = useAuth();
+  const [packages, setPackages] = useState(null); // null = cargando
+  const [failed, setFailed] = useState(false);
 
-  return (
-    <div className="page">
-      <div className="page-header">
-        <h1>Paquetes</h1>
-        <p style={{ color: 'var(--color-muted)' }}>
-          Elige el que más te acomode y te escribimos por WhatsApp para dejarlo listo.
-        </p>
-        {STUDIO_WEBSITE_URL && (
-          <p style={{ marginTop: '0.5rem' }}>
-            <a href={STUDIO_WEBSITE_URL} target="_blank" rel="noopener noreferrer">
-              Conoce más del estudio
-            </a>
-          </p>
-        )}
+  useEffect(() => {
+    let cancelled = false;
+    fetchPackages()
+      .then((data) => {
+        if (!cancelled) setPackages(Array.isArray(data) ? data : []);
+      })
+      .catch(() => {
+        if (!cancelled) setFailed(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const inquiryButton = whatsappConfigured ? (
+    <div className="help-links">
+      <a className="btn btn-primary" href={whatsappUrl(packagesInquiryMessage(user))} target="_blank" rel="noopener noreferrer">
+        Preguntar por WhatsApp
+      </a>
+    </div>
+  ) : null;
+
+  let body;
+  if (failed) {
+    body = (
+      <div className="card help-card">
+        <h2>No pudimos cargar los paquetes</h2>
+        <p>Revisa tu conexión e intenta de nuevo en un momento.</p>
+        {inquiryButton}
       </div>
-
-      {PACKAGES.length > 0 ? (
-        <div className="package-list">
-          {PACKAGES.map((pack) => (
-            <div className="card package-card" key={pack.name}>
+    );
+  } else if (packages === null) {
+    body = <div className="card help-card"><p>Cargando paquetes…</p></div>;
+  } else if (packages.length === 0) {
+    body = (
+      <div className="card help-card">
+        <h2>Pronto publicaremos nuestros paquetes</h2>
+        {whatsappConfigured ? <p>Mientras tanto, pregúntanos por WhatsApp y te contamos las opciones.</p> : <p>Mientras tanto, pregunta directamente en recepción.</p>}
+        {inquiryButton}
+      </div>
+    );
+  } else {
+    body = (
+      <div className="package-list">
+        {packages.map((pack) => {
+          const price = formatPrice(pack.price);
+          return (
+            <div className="card package-card" key={pack.id}>
               <div className="package-info">
                 <div className="package-name">{pack.name}</div>
-                {pack.detail && <div className="package-detail">{pack.detail}</div>}
-                {pack.price && <div className="package-price">{pack.price}</div>}
+                {pack.description && <div className="package-detail">{pack.description}</div>}
+                {price && <div className="package-price">{price}</div>}
               </div>
               {whatsappConfigured ? (
                 <a
@@ -46,30 +91,28 @@ export default function PackagesPage() {
                 </button>
               )}
             </div>
-          ))}
-        </div>
-      ) : (
-        <div className="card help-card">
-          <h2>Pronto publicaremos nuestros paquetes</h2>
-          {whatsappConfigured ? (
-            <>
-              <p>Mientras tanto, pregúntanos por WhatsApp y te contamos las opciones.</p>
-              <div className="help-links">
-                <a
-                  className="btn btn-primary"
-                  href={whatsappUrl(packagesInquiryMessage(user))}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Preguntar por WhatsApp
-                </a>
-              </div>
-            </>
-          ) : (
-            <p>Mientras tanto, pregunta directamente en recepción.</p>
-          )}
-        </div>
-      )}
+          );
+        })}
+      </div>
+    );
+  }
+
+  return (
+    <div className="page">
+      <div className="page-header">
+        <h1>Paquetes</h1>
+        <p style={{ color: 'var(--color-muted)' }}>
+          Elige el que más te acomode y te escribimos por WhatsApp para dejarlo listo.
+        </p>
+        {STUDIO_WEBSITE_URL && (
+          <p style={{ marginTop: '0.5rem' }}>
+            <a href={STUDIO_WEBSITE_URL} target="_blank" rel="noopener noreferrer">
+              Conoce más del estudio
+            </a>
+          </p>
+        )}
+      </div>
+      {body}
     </div>
   );
 }
