@@ -106,6 +106,27 @@ export default function ProfilePage() {
           </div>
         )}
 
+        {profile?.door_code && (
+          <div className="card" style={{ textAlign: 'center' }}>
+            <h3 style={{ marginBottom: '0.75rem' }}>Código de la puerta</h3>
+            <div
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: '2rem',
+                fontWeight: 700,
+                letterSpacing: '0.15em',
+                color: 'var(--color-primary-dark)',
+                userSelect: 'all',
+              }}
+            >
+              {profile.door_code}
+            </div>
+            <p style={{ color: 'var(--color-muted)', fontSize: '0.85rem', marginTop: '0.75rem' }}>
+              Márcalo en el teclado de la puerta para entrar.
+            </p>
+          </div>
+        )}
+
         <div className="card membership-card">
           <div className="membership-type">{membership ? membership.membership_type_name : 'Sin membresía'}</div>
           {membership ? (
