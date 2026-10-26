@@ -12,6 +12,7 @@ import {
   useNow,
 } from '../cancellation';
 import '../instructor.css';
+import '../schedule.css';
 
 const ERROR_MESSAGES = {
   MEMBERSHIP_EXPIRED: 'No tienes una membresía vigente. Habla con recepción.',
@@ -167,11 +168,13 @@ export default function SchedulePage() {
             <div className={`card session-card${isInstructor && session.is_mine ? ' session-card-mine' : ''}`} key={session.id}>
               <div className="session-time">{formatTime(session.start_datetime)}</div>
               <div className="session-info">
-                <h3>{session.name}</h3>
+                <h3 className="session-title">
+                  {session.name}
+                  {session.is_special_event && <span className="badge badge-accent">Evento especial</span>}
+                </h3>
                 <div className="session-meta">
                   <span>{session.instructor_name}</span>
                   {!isInstructor && <CapacityDots capacity={session.capacity} spotsAvailable={session.spots_available} />}
-                  {session.is_special_event && <span className="badge badge-accent">Evento especial</span>}
                 </div>
                 {!readOnly && <SessionNotices session={session} now={now} />}
                 {!readOnly && session.my_waitlist_position != null && (

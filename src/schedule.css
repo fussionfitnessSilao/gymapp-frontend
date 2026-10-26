@@ -1,0 +1,17 @@
+/* Horario: la etiqueta "Evento especial" va junto al nombre de la sesión; si no cabe, baja a la línea siguiente
+   en lugar de encimarse con el resto. */
+.session-info h3.session-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 0.5rem;
+}
+
+.session-info h3.session-title .badge {
+  flex: none;
+}
+
+/* Instructor, ocupación y demás datos también pueden bajar de renglón en pantallas angostas. */
+.session-meta {
+  flex-wrap: wrap;
+}
