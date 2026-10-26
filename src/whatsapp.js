@@ -1,4 +1,5 @@
 import { isInstalledApp } from './pwa';
+import { APP_VERSION } from './version';
 import { STUDIO_WHATSAPP } from './studioConfig';
 
 const PHONE = STUDIO_WHATSAPP.replace(/\D/g, '');
@@ -48,6 +49,7 @@ export function bugReportMessage(user, fromPath) {
   if (user?.email) lines.push(`Cuenta: ${user.email}`);
   lines.push(`Dispositivo: ${navigator.userAgent}`);
   lines.push(`App instalada: ${isInstalledApp() ? 'sí' : 'no'}`);
+  lines.push(`Versión de la app: ${APP_VERSION}`);
   lines.push(`Fecha: ${new Date().toLocaleString('es-MX')}`);
   return lines.join('\n');
 }

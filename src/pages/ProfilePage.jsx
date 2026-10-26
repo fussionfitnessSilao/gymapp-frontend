@@ -8,6 +8,7 @@ import PushCard from '../components/PushCard';
 import ThemeCard from '../components/ThemeCard';
 import { useAuth } from '../context/AuthContext';
 import { isInstalledApp } from '../pwa';
+import { APP_VERSION } from '../version';
 
 const MEMBERSHIP_STATUS_LABELS = {
   active: 'Activa',
@@ -215,6 +216,10 @@ export default function ProfilePage() {
         <button type="button" className="btn btn-ghost" onClick={handleLogout}>
           Cerrar sesión
         </button>
+
+        <p style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.75rem', color: 'var(--color-muted)', opacity: 0.6 }}>
+          {APP_VERSION}
+        </p>
       </div>
     </div>
   );
