@@ -4,9 +4,11 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { fetchCheckinToken, fetchMe, updateMe } from '../api/auth';
 import { fetchMyMembership } from '../api/membership';
 import ClientDataCard from '../components/ClientDataCard';
+import DoorCodeCard from '../components/DoorCodeCard';
 import PushCard from '../components/PushCard';
 import ThemeCard from '../components/ThemeCard';
 import { useAuth } from '../context/AuthContext';
+import { formatSavedDate, isNetworkError, loadOfflineDoor, saveOfflineSnapshot } from '../offline';
 import { isInstalledApp } from '../pwa';
 import { APP_VERSION } from '../version';
 
@@ -29,15 +31,22 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState(null);
   const [error, setError] = useState(null);
+  // Clave guardada en este teléfono (se usa mientras carga o si no hay conexión).
+  const [savedDoor] = useState(() => loadOfflineDoor());
 
   useEffect(() => {
     async function load() {
       try {
         const me = await fetchMe();
+        saveOfflineSnapshot(me); // deja en el teléfono la clave de la puerta para usarla sin conexión
         setProfile(me);
         setForm({ first_name: me.first_name, last_name: me.last_name, phone: me.phone });
       } catch (err) {
-        setError(err.message || 'No pudimos cargar tu perfil.');
+        setError(
+          isNetworkError(err)
+            ? 'Sin conexión. Te mostramos lo último que guardamos en este teléfono.'
+            : err.message || 'No pudimos cargar tu perfil.'
+        );
       }
       try {
         const myMembership = await fetchMyMembership();
@@ -88,7 +97,48 @@ export default function ProfilePage() {
     navigate('/login');
   }
 
-  if (loading) return <div className="page-loading">Cargando…</div>;
+  const savedDoorNote = savedDoor
+    ? `Guardado el ${formatSavedDate(savedDoor.savedAt)}. Si cambió tu membresía, conéctate para actualizarlo.`
+    : null;
+
+  if (loading) {
+    // Con internet "a medias" la carga puede tardar: la clave guardada se muestra de inmediato.
+    return (
+      <div className="page">
+        {savedDoor && !savedDoor.expired && (
+          <div className="profile-grid">
+            <DoorCodeCard code={savedDoor.code} note={savedDoorNote} />
+          </div>
+        )}
+        <div className="page-loading">Cargando…</div>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    // No se pudo hablar con el servidor: solo lo que hay guardado en el teléfono.
+    return (
+      <div className="page">
+        <div className="page-header">
+          <h1>Tu perfil</h1>
+        </div>
+        <div className="profile-grid">
+          {error && <div className="error-banner">{error}</div>}
+          {savedDoor && !savedDoor.expired && <DoorCodeCard code={savedDoor.code} note={savedDoorNote} />}
+          {savedDoor && savedDoor.expired && (
+            <div className="card" style={{ textAlign: 'center' }}>
+              <p style={{ margin: 0 }}>
+                Tu clave guardada ya es muy antigua. Conéctate a internet una vez para actualizarla.
+              </p>
+            </div>
+          )}
+          <button type="button" className="btn btn-ghost" onClick={() => window.location.reload()}>
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="page">
@@ -107,26 +157,7 @@ export default function ProfilePage() {
           </div>
         )}
 
-        {profile?.door_code && (
-          <div className="card" style={{ textAlign: 'center' }}>
-            <h3 style={{ marginBottom: '0.75rem' }}>Código de la puerta</h3>
-            <div
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: '2rem',
-                fontWeight: 700,
-                letterSpacing: '0.15em',
-                color: 'var(--color-primary-dark)',
-                userSelect: 'all',
-              }}
-            >
-              {profile.door_code}
-            </div>
-            <p style={{ color: 'var(--color-muted)', fontSize: '0.85rem', marginTop: '0.75rem' }}>
-              Márcalo en el teclado de la puerta para entrar.
-            </p>
-          </div>
-        )}
+        {profile.door_code && <DoorCodeCard code={profile.door_code} />}
 
         <div className="card membership-card">
           <div className="membership-type">{membership ? membership.membership_type_name : 'Sin membresía'}</div>
