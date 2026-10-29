@@ -5,6 +5,7 @@ import { fetchCheckinToken, fetchMe, updateMe } from '../api/auth';
 import { fetchMyMembership } from '../api/membership';
 import ClientDataCard from '../components/ClientDataCard';
 import DoorCodeCard from '../components/DoorCodeCard';
+import NotificationPreferencesCard from '../components/NotificationPreferencesCard';
 import PushCard from '../components/PushCard';
 import ThemeCard from '../components/ThemeCard';
 import { useAuth } from '../context/AuthContext';
@@ -229,6 +230,8 @@ export default function ProfilePage() {
         {user?.role === 'client' && <ClientDataCard />}
 
         {(user?.role === 'client' || user?.role === 'admin') && <PushCard isAdmin={user?.role === 'admin'} />}
+
+        {user?.role === 'client' && <NotificationPreferencesCard />}
 
         <ThemeCard />
 
