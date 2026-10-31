@@ -14,6 +14,7 @@ const KINDS = {
   // Avisos para Admin: no llevan a otra pantalla de la app (el detalle está en el panel de administración).
   admin_system_alert: { title: 'Alerta del sistema' },
   admin_new_client: { title: 'Nuevo registro' },
+  admin_signup_followup: { title: 'Seguimiento de registros' },
 };
 
 function formatWhen(iso) {
